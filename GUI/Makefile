@@ -1,6 +1,6 @@
-COMPILE=clang++
+COMPILE=g++
 
-LIBS=-L/usr/X11R6/lib -lGL -lGLU -lglut -lXmu -lXi -lm
+LIBS=-L/usr/X11R6/lib -lGL -lGLU -lglut -lm
 OBJS=main.o
 
 all : ui_test
