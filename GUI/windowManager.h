@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -9,6 +10,12 @@
 #endif
 
 #include <GL/glut.h>
+
+
+#define MSG_TO_LOG(format, args...)                 \
+    FILE *log = fopen(log_name, "at");              \
+    fprintf(log, format, ##args);                        \
+    fclose(log);                                    
 
 const char log_name[] = "GUI.log";
 
@@ -39,6 +46,8 @@ private:
     size_t id;
 
 public:
+    static size_t GetQty() { return qty; }
+
     Button(int x = 0, int y = 0, int width = 0, int height = 0, const char text[] = nullptr, ButtonCallback function = nullptr)
         : callbackFunction(function)
         , x(x)
@@ -51,12 +60,19 @@ public:
         this->label = strdup(text);
         this->id = qty;
         ++qty;
+
+        MSG_TO_LOG ( "Created button with id '%lu'!\n", id );
     }
 
     ~Button()
     {
+
+        MSG_TO_LOG ( "Deleted button [%p] with id '%lu' and label '%s'!\n", this, id, label );
+
+
         --qty;
         free(label);
+
     }
     Button(const Button& from)
         : callbackFunction(from.callbackFunction)
@@ -69,6 +85,9 @@ public:
     {
         this->label = strdup(from.label);
         ++qty;
+        this->id = qty;
+
+        MSG_TO_LOG ( "Copied button with id '%lu'!\n", id );
     }
 
     // functions
@@ -91,30 +110,8 @@ public:
 };
 
 size_t Button::qty = 0;
+Button *buttons = nullptr;
 
-
-/*----------------------------------------------------------------------------------------
-    *	This is an example callback function. Notice that it's type is the same
-    *	an the ButtonCallback type. We can assign a pointer to this function which
-    *	we can store and later call.
-    */
-void TheButtonCallback()
-{
-    printf("God saves the cat 1!\n");
-}
-void TheButtonCallback2()
-{
-    printf("God saves the cat 2!\n");
-}
-
-void TheButtonCallback3()
-{
-    printf("God saves the cat 3!\n");
-}
-
-Button button_1 = Button(5, 5, window_width / 3 - 10, 25, "Button 1", TheButtonCallback);
-Button button_2 = Button(window_width / 3 + 5, 5, window_width / 3 - 10, 25, "Button 2", TheButtonCallback2);
-Button button_3 = Button(window_width * 2 / 3 + 5, 5, window_width / 3 - 10, 25, "Button 3", TheButtonCallback3);
 /*----------------------------------------------------------------------------------------
     *	\brief	This function draws a text string to the screen using glut bitmap fonts.
     *	\param	font	-	the font to use. it can be one of the following : 
@@ -240,18 +237,12 @@ void ButtonDraw(Button* b)
     int fontx = 0, fonty = 0;
 
     if (b != NULL) {
-        /*
-            *	We will indicate that the mouse cursor is over the button by changing its
-            *	colour.
-            */
+
         if (b->highlighted)
             glColor3f(0.7f, 0.7f, 0.8f);
         else
             glColor3f(0.6f, 0.6f, 0.6f);
 
-        /*
-            *	draw background for the button.
-            */
         glBegin(GL_QUADS);
         glVertex2i(b->x, b->y);
         glVertex2i(b->x, b->y + b->height);
@@ -259,14 +250,9 @@ void ButtonDraw(Button* b)
         glVertex2i(b->x + b->width, b->y);
         glEnd();
 
-        /*
-            *	Draw an outline around the button with width 3
-            */
+        
         glLineWidth(3);
 
-        /*
-            *	The colours for the outline are reversed when the button. 
-            */
         if (b->pressed)
             glColor3f(0.4f, 0.4f, 0.4f);
         else
@@ -299,7 +285,7 @@ void ButtonDraw(Button* b)
 
         /*
             *	if the button is pressed, make it look as though the string has been pushed
-            *	down. It's just a visual thing to help with the overall look....
+            *	down.
             */
         if (b->pressed) {
             fontx += 2;
@@ -321,15 +307,15 @@ void ButtonDraw(Button* b)
     }
 }
 
-/*----------------------------------------------------------------------------------------
-    *	This function will be used to draw an overlay over the 3D scene.
-    *	This will be used to draw our fonts, buttons etc......
-    */
+
 void Draw2D()
 {
-    ButtonDraw(&button_1);
-    ButtonDraw(&button_2);
-    ButtonDraw(&button_3);
+    for (size_t i = 0; i < ::Button::GetQty(); ++i){
+        ButtonDraw(&buttons[i]);
+    }
+//     ButtonDraw(&buttons[0]);
+//     ButtonDraw(&buttons[1]);
+//     ButtonDraw(&buttons[2]);
 }
 
 /*----------------------------------------------------------------------------------------
@@ -361,12 +347,12 @@ void Resize(int w, int h)
     window_width = w;
     window_height = h;
 
-    button_1.width = window_width / 3 - 12;
-    button_2.width = window_width / 3 - 12;
-    button_3.width = window_width / 3 - 12;
+    buttons[0].width = window_width / 3 - 12;
+    buttons[1].width = window_width / 3 - 12;
+    buttons[2].width = window_width / 3 - 12;
 
-    button_2.x = window_width / 3 + 5;
-    button_3.x = window_width * 2 / 3 + 5;
+    buttons[1].x = window_width / 3 + 5;
+    buttons[2].x = window_width * 2 / 3 + 5;
 
     glViewport(0, 0, w, h);
 }
@@ -397,9 +383,9 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
         switch (mouse_button) {
         case GLUT_LEFT_BUTTON:
             TheMouse.right_button_pressed = 1;
-            ButtonPress(&button_1, x, y);
-            ButtonPress(&button_2, x, y);
-            ButtonPress(&button_3, x, y);
+            ButtonPress(&buttons[0], x, y);
+            ButtonPress(&buttons[1], x, y);
+            ButtonPress(&buttons[2], x, y);
             break;
         case GLUT_MIDDLE_BUTTON:
             TheMouse.middle_button_pressed = 1;
@@ -413,9 +399,9 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
         switch (mouse_button) {
         case GLUT_LEFT_BUTTON:
             TheMouse.right_button_pressed = 0;
-            ButtonRelease(&button_1, x, y);
-            ButtonRelease(&button_2, x, y);
-            ButtonRelease(&button_3, x, y);
+            ButtonRelease(&buttons[0], x, y);
+            ButtonRelease(&buttons[1], x, y);
+            ButtonRelease(&buttons[2], x, y);
             break;
         case GLUT_MIDDLE_BUTTON:
             TheMouse.middle_button_pressed = 0;
@@ -440,9 +426,9 @@ void MouseMotion(int x, int y)
     TheMouse.x = x;
     TheMouse.y = y;
 
-    ButtonPassive(&button_1, x, y);
-    ButtonPassive(&button_2, x, y);
-    ButtonPassive(&button_3, x, y);
+    ButtonPassive(&buttons[0], x, y);
+    ButtonPassive(&buttons[1], x, y);
+    ButtonPassive(&buttons[2], x, y);
 
     glutPostRedisplay();
 }
@@ -461,14 +447,14 @@ void MousePassiveMotion(int x, int y)
     /*
         *	Check buttons to see if we should highlight it
         */
-    ButtonPassive(&button_1, x, y);
-    ButtonPassive(&button_2, x, y);
-    ButtonPassive(&button_3, x, y);
+    ButtonPassive(&buttons[0], x, y);
+    ButtonPassive(&buttons[1], x, y);
+    ButtonPassive(&buttons[2], x, y);
 }
 
-int main(int argc, char** argv)
+void run(int argc, char** argv)
 {
-
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(window_width, window_height);
