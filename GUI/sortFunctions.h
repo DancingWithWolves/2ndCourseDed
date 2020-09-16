@@ -8,26 +8,27 @@
 #include <string.h>
 
 typedef int (*compare_t)(const void*, const void*);
+typedef void (*swap_t)(void*, void*, int);
 
-/*!
- * Меняет местами содержимое памяти elem_1 и elem_2
- * @param elem_1 указатель на первый элемент
- * @param elem_2 указатель на второй элемент
- * @param elem_size размер элемента
- */
-void Swap(void* elem_1, void* elem_2, int elem_size)
-{
-    assert(elem_1);
-    assert(elem_2);
-    char cur = *(char*)elem_1;
-    for (int i = 0; i < elem_size; i++) {
-        cur = *(char*)elem_1;
-        *(char*)elem_1 = *(char*)elem_2;
-        *(char*)elem_2 = cur;
-        elem_1 = (char*)elem_1 + 1;
-        elem_2 = (char*)elem_2 + 1;
-    }
-}
+// /*!
+//  * Меняет местами содержимое памяти elem_1 и elem_2
+//  * @param elem_1 указатель на первый элемент
+//  * @param elem_2 указатель на второй элемент
+//  * @param elem_size размер элемента
+//  */
+// void Swap(void* elem_1, void* elem_2, int elem_size)
+// {
+//     assert(elem_1);
+//     assert(elem_2);
+//     char cur = *(char*)elem_1;
+//     for (int i = 0; i < elem_size; i++) {
+//         cur = *(char*)elem_1;
+//         *(char*)elem_1 = *(char*)elem_2;
+//         *(char*)elem_2 = cur;
+//         elem_1 = (char*)elem_1 + 1;
+//         elem_2 = (char*)elem_2 + 1;
+//     }
+// }
 /*!
  * "раскидывает" все элементы массива относительно стержня, равному среднему элементу массива
  * @param arr сортируемый массив
@@ -37,13 +38,13 @@ void Swap(void* elem_1, void* elem_2, int elem_size)
  * @param right индекс второго элемента сортируемого подмассива
  * @return возвращает новое значение стержня. Справа и слева от него -- два неотсортированных подмассива
  */
-int Partition(void* arr, int elem_size, compare_t compare, int left, int right)
+int Partition(void* arr, int elem_size, compare_t compare, swap_t swap, int left, int right)
 {
     assert(arr);
     int mid = (right + left) / 2;
     void* leftElem = (char*)arr + (left * elem_size);
     void* pivot = (char*)arr + (mid * elem_size);
-    Swap(leftElem, pivot, elem_size);
+    swap(leftElem, pivot, elem_size);
     int last = left;
     void *tmp, *tmp2, *root = (char*)arr + (left * elem_size);
     for (int i = left + 1; i <= right; i++) {
@@ -52,11 +53,11 @@ int Partition(void* arr, int elem_size, compare_t compare, int left, int right)
         if (compare(root, tmp) > 0) {
             last++;
             tmp2 = (char*)arr + (last * elem_size);
-            Swap(tmp2, tmp, elem_size);
+            swap(tmp2, tmp, elem_size);
         }
     }
     tmp = (char*)arr + (last * elem_size);
-    Swap(tmp, root, elem_size);
+    swap(tmp, root, elem_size);
     return last;
 }
 
@@ -68,13 +69,13 @@ int Partition(void* arr, int elem_size, compare_t compare, int left, int right)
  * @param left индекс самого левого элемента (в общем случае 0)
  * @param right индекс самого правого элемента в общем случае ( n - 1 ), где n -- количество элементов в массиве
  */
-void QuickSort(void* arr, int elem_size, compare_t compare, int left, int right)
+void QuickSort(void* arr, int elem_size, compare_t compare, swap_t swap, int left, int right)
 {
     assert(arr);
     if (left < right) {
-        int newIndex = Partition(arr, elem_size, compare, left, right);
-        QuickSort(arr, elem_size, compare, left, newIndex - 1);
-        QuickSort(arr, elem_size, compare, newIndex + 1, right);
+        int newIndex = Partition(arr, elem_size, compare, swap, left, right);
+        QuickSort(arr, elem_size, compare, swap, left, newIndex - 1);
+        QuickSort(arr, elem_size, compare, swap, newIndex + 1, right);
     }
 }
 
@@ -86,7 +87,7 @@ void QuickSort(void* arr, int elem_size, compare_t compare, int left, int right)
  * @param left индекс самого левого элемента (в общем случае 0)
  * @param right индекс самого правого элемента в общем случае ( n - 1 ), где n -- количество элементов в массиве
  */
-void BubbleSort(void* arr, int elem_size, compare_t compare, int left, int right)
+void BubbleSort(void* arr, int elem_size, compare_t compare, swap_t swap, int left, int right)
 {
     assert(arr);
     for (int i = 0; i < right; ++i) {
@@ -96,7 +97,7 @@ void BubbleSort(void* arr, int elem_size, compare_t compare, int left, int right
             char* ptr_2 = (char*)arr + j * elem_size;
 
             if (compare(ptr_2, ptr_2 + elem_size) > 0)
-                Swap(ptr_2, ptr_2 + elem_size, elem_size);
+                swap(ptr_2, ptr_2 + elem_size, elem_size);
         }
     }
 }
@@ -109,7 +110,7 @@ void BubbleSort(void* arr, int elem_size, compare_t compare, int left, int right
  * @param left индекс самого левого элемента (в общем случае 0)
  * @param right индекс самого правого элемента в общем случае ( n - 1 ), где n -- количество элементов в массиве
  */
-void InsertionSort(void* arr, int elem_size, compare_t compare, int left, int right)
+void InsertionSort(void* arr, int elem_size, compare_t compare, swap_t swap, int left, int right)
 {
     assert(arr);
     char* char_arr = (char*)arr;
@@ -118,7 +119,7 @@ void InsertionSort(void* arr, int elem_size, compare_t compare, int left, int ri
         char* key_ptr = char_arr + i * elem_size;
         j = i - 1;
         while (j >= 0 && compare(key_ptr - elem_size, key_ptr) > 0) {
-            Swap(key_ptr, key_ptr - elem_size, elem_size);
+            swap(key_ptr, key_ptr - elem_size, elem_size);
             key_ptr -= elem_size;
             --j;
         }
