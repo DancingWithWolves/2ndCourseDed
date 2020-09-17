@@ -1,5 +1,6 @@
 #include "sortFunctions.h"
-#include "windowManager.h"
+// #include "windowManager.h"
+#include "clearWindowManager.cpp"
 #include <stdio.h>
 
 /**
@@ -96,25 +97,28 @@ int main(int argc, char** argv)
         , default_margin
         , window_width / buttons_qty - 2 * default_margin
         , button_height
-        , "Bubble sort"
-        , ShowBubbleSortStat);
+        , ShowBubbleSortStat
+        , "Bubble sort");
 
     button = new (buttons + 1) Button 
         ( window_width / buttons_qty + default_margin
         , default_margin
         , window_width / buttons_qty - 2 * default_margin
         , button_height
-        , "Insertion sort"
-        , ShowInsertionSortStat);
+        , ShowInsertionSortStat
+        , "Insertion sort");
 
     button = new (buttons + 2) Button 
         ( window_width * 2 / buttons_qty + default_margin
         , default_margin
         , window_width / buttons_qty - 2 * default_margin
         , button_height
-        , "Quick sort"
-        , ShowQuickSortStat);
+        , ShowQuickSortStat
+        , "Quick sort");
 
+    for (int i = 0; i < buttons_qty; ++i) {
+        drawable_list.push_front(&buttons[i]);
+    }
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(window_width, window_height);

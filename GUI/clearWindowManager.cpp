@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <forward_list>
 
 #define DEBUG
 
@@ -43,6 +44,34 @@ Mouse TheMouse = Mouse(); //дефолтный конструктор всё з�
 int window_width = 640;
 int window_height = 480;
 
+
+
+/*----------------------------------------------------------------------------------------
+    *	\brief	Эта функция рисует текстовую строку на экран, используя шрифты глюта.
+    *	\param	font	-	Шрифт. Один из следующих : 
+    *
+    *					GLUT_BITMAP_9_BY_15		
+    *					GLUT_BITMAP_8_BY_13			
+    *					GLUT_BITMAP_TIMES_ROMAN_10	
+    *					GLUT_BITMAP_TIMES_ROMAN_24	
+    *					GLUT_BITMAP_HELVETICA_10	
+    *					GLUT_BITMAP_HELVETICA_12	
+    *					GLUT_BITMAP_HELVETICA_18	
+    *
+    *	\param	text	-	Строка на вывод
+    *	\param	x		-	Координата x (центр текста)
+    *	\param	y		-	Координата y (центр текста)
+    */
+void Font(void* font, char* text, int x, int y)
+{
+    glRasterPos2i(x, y);
+
+    while (*text != '\0') {
+        glutBitmapCharacter(font, *text);
+        ++text;
+    }
+}
+
 struct Drawable {
 
     Drawable(int x = 0, int y = 0, int width = 0, int height = 0)
@@ -66,10 +95,11 @@ struct Drawable {
     }
 
     void virtual Draw() = 0;
-    void virtual Passive() = 0;
 
     int x, y, width, height;
 };
+
+std::forward_list<Drawable*> drawable_list; 
 
 typedef void (*Callback)();
 
@@ -80,11 +110,12 @@ struct Clickable : public Drawable {
         , callback(callback)
         , pressed(false)
         , highlighted(false)
-        , active(false)
+        , active(true)
     {
     }
 
-    void virtual OnClick() = 0;
+    void virtual OnPress(int mouse_x, int mouse_y) = 0;
+    void virtual OnRelease(int mouse_x, int mouse_y) = 0;
     bool pressed, highlighted, active;
 
 protected:
@@ -92,7 +123,13 @@ protected:
 };
 
 struct Button : public Clickable {
-    Button(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr, const char text[] = nullptr)
+    Button(   int x = 0
+            , int y = 0
+            , int width = 0
+            , int height = 0
+            , Callback callback = nullptr
+            , const char text[] = nullptr)
+
         : Clickable(x, y, width, height, callback)
     {
         id = qty++;
@@ -102,9 +139,9 @@ struct Button : public Clickable {
 
     ~Button()
     {
+        ON_DEBUG(MSG_TO_LOG("Deleted button [%p] with id '%lu' and label '%s'!\n", this, id, label);)
         free(label);
         --qty;
-        ON_DEBUG(MSG_TO_LOG("Deleted button [%p] with id '%lu' and label '%s'!\n", this, id, label);)
     }
 
     Button(const Button& from)
@@ -115,11 +152,27 @@ struct Button : public Clickable {
         ON_DEBUG(MSG_TO_LOG("Copied Button with id '%lu'!\n", id);)
     }
 
-    void OnClick()
+    void OnPress(int mouse_x, int mouse_y)
     {
-        ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%ld' Button pressed!\n", id);)
-        callback();
+        if (CheckMouseOver(mouse_x, mouse_y) && active) {
+            ON_DEBUG(MSG_TO_LOG("button[%d]->active = %d\n", GetId(), active))
+            pressed = true;
+        }
     }
+
+
+    void OnRelease(int mouse_x, int mouse_y)
+    {
+        if (    CheckMouseOver(TheMouse.xpress, TheMouse.ypress)
+             && CheckMouseOver(mouse_x, mouse_y) 
+             && pressed ) {
+            ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%ld' Button pressed!\n", id);)
+            callback();
+        }
+        pressed = false;
+    }
+
+
 
     size_t GetId() { return id; }
 
@@ -179,13 +232,13 @@ struct Button : public Clickable {
         // Если курсор сейчас над кнопкой, мы смещаем текст и рисуем "тень"
         if (this->highlighted) {
             glColor3f(0, 0, 0);
-            Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
+            ::Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
             fontx--;
             fonty--;
         }
 
         glColor3f(1, 1, 1);
-        Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
+        ::Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
     }
 
     
@@ -198,71 +251,9 @@ private:
 
 size_t Button::qty = 0;
 
-size_t Button::qty = 0;
 Button* buttons = nullptr;
 
-/*----------------------------------------------------------------------------------------
-    *	\brief	Эта функция рисует текстовую строку на экран, используя шрифты глюта.
-    *	\param	font	-	Шрифт. Один из следующих : 
-    *
-    *					GLUT_BITMAP_9_BY_15		
-    *					GLUT_BITMAP_8_BY_13			
-    *					GLUT_BITMAP_TIMES_ROMAN_10	
-    *					GLUT_BITMAP_TIMES_ROMAN_24	
-    *					GLUT_BITMAP_HELVETICA_10	
-    *					GLUT_BITMAP_HELVETICA_12	
-    *					GLUT_BITMAP_HELVETICA_18	
-    *
-    *	\param	text	-	Строка на вывод
-    *	\param	x		-	Координата x (центр текста)
-    *	\param	y		-	Координата y (центр текста)
-    */
-void Font(void* font, char* text, int x, int y)
-{
-    glRasterPos2i(x, y);
 
-    while (*text != '\0') {
-        glutBitmapCharacter(font, *text);
-        ++text;
-    }
-}
-
-
-/*----------------------------------------------------------------------------------------
-    *	\brief	Обработчик нажатия кнопки
-    *	\param	b	-	Указатель на кнопку, которую проверяем.
-    *	\param	x	-	x-координата мышки.
-    *	\param	y	-	y- координата мышки.
-    */
-void ButtonPress(Button* b, int x, int y)
-{
-    ON_DEBUG(assert(b);)
-    if (b) {
-        if (b->CheckMouseOver(x, y) && b->active) {
-            ON_DEBUG(MSG_TO_LOG("button[%d]->active = %d\n", b->GetId(), b->active))
-            b->pressed = true;
-        }
-    }
-}
-
-/*----------------------------------------------------------------------------------------
-    *	\brief	Обработчик отпускание кнопки мыши.
-    *	\param	b	-	Указатель на кнопку, которую проверяем.
-    *	\param	x	-	x-координата мышки.
-    *	\param	y	-	y-координата мышки.
-    */
-void ButtonRelease(Button* b, int x, int y)
-{
-    ON_DEBUG(assert(b);)
-    if (b) {
-
-        if (b->CheckMouseOver(TheMouse.xpress, TheMouse.ypress)
-            && b->CheckMouseOver(x, y) && b->pressed) {
-            b->OnClick();
-        }
-        b->pressed = false;
-    }
-}
 
 /*----------------------------------------------------------------------------------------
     *	\brief	Рисует кнопку.
@@ -299,8 +290,8 @@ void ButtonPassive(Button* b, int x, int y)
 */
 void Draw2D()
 {
-    for (int i = 0; i < buttons_qty; ++i) {
-        buttons[i].Draw();
+    for (auto i : drawable_list) {
+        i->Draw();
     }
 }
 
@@ -365,7 +356,7 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
         case GLUT_LEFT_BUTTON:
             TheMouse.right_button_pressed = 1;
             for (int i = 0; i < buttons_qty; ++i) {
-                ButtonPress(&buttons[i], x, y);
+                buttons[i].OnPress(x, y);
             }
             break;
         case GLUT_MIDDLE_BUTTON:
@@ -382,7 +373,7 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
             TheMouse.right_button_pressed = 0;
 
             for (int i = 0; i < buttons_qty; ++i) {
-                ButtonRelease(&buttons[i], x, y);
+                buttons[i].OnRelease(x, y);
             }
 
             break;
@@ -432,3 +423,6 @@ void MousePassiveMotion(int x, int y)
         ButtonPassive(&buttons[i], x, y);
     }
 }
+
+
+
