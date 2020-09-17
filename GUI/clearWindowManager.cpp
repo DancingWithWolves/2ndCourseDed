@@ -1,13 +1,12 @@
 #pragma once
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #define DEBUG
-
 
 #include <GL/glut.h>
 
@@ -44,80 +43,163 @@ Mouse TheMouse = Mouse(); //дефолтный конструктор всё з�
 int window_width = 640;
 int window_height = 480;
 
-struct Button {
+struct Drawable {
 
-    typedef void (*ButtonCallback)();
-
-private:
-    static size_t qty;
-    size_t id;
-
-public:
-    static size_t GetQty() { return qty; }
-    size_t GetId() { return id; }
-
-    explicit Button(int x = 0, int y = 0, int width = 0, int height = 0, const char text[] = nullptr, ButtonCallback function = nullptr, bool active = true)
-        : callback_function(function)
-        , x(x)
+    Drawable(int x = 0, int y = 0, int width = 0, int height = 0)
+        : x(x)
         , y(y)
-        , height(height)
         , width(width)
+        , height(height)
+    {
+    }
+
+    bool CheckMouseOver (int mouse_x, int mouse_y)
+    {
+        if (mouse_x > x
+            && mouse_x < x + width
+            && mouse_y > y
+            && mouse_y < y + height) {
+            return true;
+        }
+
+        return false;
+    }
+
+    void virtual Draw() = 0;
+    void virtual Passive() = 0;
+
+    int x, y, width, height;
+};
+
+typedef void (*Callback)();
+
+struct Clickable : public Drawable {
+
+    Clickable(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr)
+        : Drawable(x, y, width, height)
+        , callback(callback)
         , pressed(false)
         , highlighted(false)
-        , active (active)
+        , active(false)
     {
-        this->label = strdup(text);
-        this->id = qty;
-        ++qty;
+    }
 
+    void virtual OnClick() = 0;
+    bool pressed, highlighted, active;
+
+protected:
+    Callback callback;
+};
+
+struct Button : public Clickable {
+    Button(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr, const char text[] = nullptr)
+        : Clickable(x, y, width, height, callback)
+    {
+        id = qty++;
+        label = strdup(text);
         ON_DEBUG(MSG_TO_LOG("Created button with id '%lu'!\n", id);)
     }
 
     ~Button()
     {
-
-        ON_DEBUG(MSG_TO_LOG("Deleted button [%p] with id '%lu' and label '%s'!\n", this, id, label);)
-
-        --qty;
         free(label);
+        --qty;
+        ON_DEBUG(MSG_TO_LOG("Deleted button [%p] with id '%lu' and label '%s'!\n", this, id, label);)
     }
-    explicit Button(const Button& from)
-        : callback_function(from.callback_function)
-        , x(from.x)
-        , y(from.y)
-        , height(from.height)
-        , width(from.width)
-        , pressed(false)
-        , highlighted(false)
-        , active(from.active)
+
+    Button(const Button& from)
+        : Clickable(from)
     {
-        this->label = strdup(from.label);
-        ++qty;
-        this->id = qty;
-
-        ON_DEBUG(MSG_TO_LOG("Copied button with id '%lu'!\n", id);)
+        id = qty++;
+        label = strdup(from.label);
+        ON_DEBUG(MSG_TO_LOG("Copied Button with id '%lu'!\n", id);)
     }
 
-    void OnPressed()
+    void OnClick()
     {
-        ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%ld' button pressed!\n", id);)
-        callback_function();
+        ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%ld' Button pressed!\n", id);)
+        callback();
     }
 
-    int x;
-    int y;
-    int width;
-    int height;
-    bool pressed;
-    bool highlighted;
-    bool active;
+    size_t GetId() { return id; }
+
+    void Draw()
+    {
+        int fontx = 0, fonty = 0;
+
+        // Меняем цвет кнопки, если она под курсором
+        if (this->highlighted)
+            glColor3f(0.7f, 0.7f, 0.8f);
+        else
+            glColor3f(0.6f, 0.6f, 0.6f);
+
+        glBegin(GL_QUADS);
+        glVertex2i(this->x, this->y);
+        glVertex2i(this->x, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y);
+        glEnd();
+
+        glLineWidth(3);
+
+        if (this->pressed)
+            glColor3f(0.4f, 0.4f, 0.4f);
+        else
+            glColor3f(0.8f, 0.8f, 0.8f);
+
+        glBegin(GL_LINE_STRIP);
+        glVertex2i(this->x + this->width, this->y);
+        glVertex2i(this->x, this->y);
+        glVertex2i(this->x, this->y + this->height);
+        glEnd();
+
+        if (this->pressed)
+            glColor3f(0.8f, 0.8f, 0.8f);
+        else
+            glColor3f(0.4f, 0.4f, 0.4f);
+
+        glBegin(GL_LINE_STRIP);
+        glVertex2i(this->x, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y);
+        glEnd();
+
+        glLineWidth(1);
+
+        // Вычисляем координаты строчки ровно по центру кнопки
+        fontx = this->x + (this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_10, reinterpret_cast<unsigned char*>(this->label))) / 2;
+        fonty = this->y + (this->height + 10) / 2;
+
+        // Если кнопка нажата, смещаем текст вниз
+        if (this->pressed) {
+            fontx += 2;
+            fonty += 2;
+        }
+
+        // Если курсор сейчас над кнопкой, мы смещаем текст и рисуем "тень"
+        if (this->highlighted) {
+            glColor3f(0, 0, 0);
+            Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
+            fontx--;
+            fonty--;
+        }
+
+        glColor3f(1, 1, 1);
+        Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
+    }
+
+    
+
+private:
+    static size_t qty;
+    size_t id;
     char* label;
-    ButtonCallback callback_function;
 };
 
 size_t Button::qty = 0;
-Button* buttons = nullptr;
 
+size_t Button::qty = 0;
+Button* buttons = nullptr;
 
 /*----------------------------------------------------------------------------------------
     *	\brief	Эта функция рисует текстовую строку на экран, используя шрифты глюта.
@@ -145,26 +227,6 @@ void Font(void* font, char* text, int x, int y)
     }
 }
 
-/*----------------------------------------------------------------------------------------
-    *	\brief	Проверяет, нажата ли в текущий момент кнопка
-    *	\param	b	-	Указатель на кнопку, которую проверяем
-    *	\param	x	-	Нажатый x
-    *	\param	y	-	Нажатый y
-    */
-bool ButtonClickTest(Button* b, int x, int y)
-{
-    ON_DEBUG(assert(b);)
-    if (b) {
-        if (x > b->x
-            && x < b->x + b->width
-            && y > b->y
-            && y < b->y + b->height) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 /*----------------------------------------------------------------------------------------
     *	\brief	Обработчик нажатия кнопки
@@ -176,7 +238,7 @@ void ButtonPress(Button* b, int x, int y)
 {
     ON_DEBUG(assert(b);)
     if (b) {
-        if (ButtonClickTest(b, x, y) && b->active) {
+        if (b->CheckMouseOver(x, y) && b->active) {
             ON_DEBUG(MSG_TO_LOG("button[%d]->active = %d\n", b->GetId(), b->active))
             b->pressed = true;
         }
@@ -194,9 +256,9 @@ void ButtonRelease(Button* b, int x, int y)
     ON_DEBUG(assert(b);)
     if (b) {
 
-        if (ButtonClickTest(b, TheMouse.xpress, TheMouse.ypress)
-            && ButtonClickTest(b, x, y) && b->pressed) {
-            b->OnPressed();
+        if (b->CheckMouseOver(TheMouse.xpress, TheMouse.ypress)
+            && b->CheckMouseOver(x, y) && b->pressed) {
+            b->OnClick();
         }
         b->pressed = false;
     }
@@ -213,7 +275,7 @@ void ButtonPassive(Button* b, int x, int y)
     ON_DEBUG(assert(b);)
     if (b) {
 
-        if (ButtonClickTest(b, x, y)) {
+        if (b->CheckMouseOver(x, y)) {
 
             // Если кнопка ещё не подсвечена, подсвечиваем путём glutPostRedisplay()
             if (b->highlighted == 0) {
@@ -233,86 +295,12 @@ void ButtonPassive(Button* b, int x, int y)
 }
 
 /*----------------------------------------------------------------------------------------
-    *	\brief	Рисуем кнопку
-    *	\param	b	-	Указатель на кнопку, которую надо нарисовать.
-    */
-void ButtonDraw(const Button* b)
-{
-    ON_DEBUG(assert(b);)
-    int fontx = 0, fonty = 0;
-
-    if (b != NULL) {
-
-        // Меняем цвет кнопки, если она под курсором
-        if (b->highlighted)
-            glColor3f(0.7f, 0.7f, 0.8f);
-        else
-            glColor3f(0.6f, 0.6f, 0.6f);
-
-        glBegin(GL_QUADS);
-        glVertex2i(b->x, b->y);
-        glVertex2i(b->x, b->y + b->height);
-        glVertex2i(b->x + b->width, b->y + b->height);
-        glVertex2i(b->x + b->width, b->y);
-        glEnd();
-
-        glLineWidth(3);
-
-        if (b->pressed)
-            glColor3f(0.4f, 0.4f, 0.4f);
-        else
-            glColor3f(0.8f, 0.8f, 0.8f);
-
-        glBegin(GL_LINE_STRIP);
-        glVertex2i(b->x + b->width, b->y);
-        glVertex2i(b->x, b->y);
-        glVertex2i(b->x, b->y + b->height);
-        glEnd();
-
-        if (b->pressed)
-            glColor3f(0.8f, 0.8f, 0.8f);
-        else
-            glColor3f(0.4f, 0.4f, 0.4f);
-
-        glBegin(GL_LINE_STRIP);
-        glVertex2i(b->x, b->y + b->height);
-        glVertex2i(b->x + b->width, b->y + b->height);
-        glVertex2i(b->x + b->width, b->y);
-        glEnd();
-
-        glLineWidth(1);
-
-        // Вычисляем координаты строчки ровно по центру кнопки
-        fontx = b->x + (b->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_10, reinterpret_cast<unsigned char*>(b->label))) / 2;
-        fonty = b->y + (b->height + 10) / 2;
-
-        //    Если кнопка нажата, смещаем текст вниз
-        if (b->pressed) {
-            fontx += 2;
-            fonty += 2;
-        }
-
-        // Если курсор сейчас над кнопкой, мы смещаем текст и рисуем "тень"
-        if (b->highlighted) {
-            glColor3f(0, 0, 0);
-            Font(GLUT_BITMAP_HELVETICA_10, b->label, fontx, fonty);
-            fontx--;
-            fonty--;
-        }
-
-        glColor3f(1, 1, 1);
-        Font(GLUT_BITMAP_HELVETICA_10, b->label, fontx, fonty);
-    }
-}
-
-/*----------------------------------------------------------------------------------------
 *	Функция, отвечающая за отрисовку всех объектов на 2д-оверлей над 3д-полем.
 */
 void Draw2D()
 {
     for (int i = 0; i < buttons_qty; ++i) {
-        ButtonDraw(&buttons[i]);
-        
+        buttons[i].Draw();
     }
 }
 
@@ -353,7 +341,7 @@ void Resize(int w, int h)
 }
 
 /*----------------------------------------------------------------------------------------
-    *	\brief	This function is called whenever a mouse button is pressed or released
+    *	\brief	This function is called whenever a mouse Button is pressed or released
     *	\param	button	-	GLUT_LEFT_BUTTON, GLUT_RIGHT_BUTTON, or GLUT_MIDDLE_BUTTON
     *	\param	pressed	-	GLUT_UP or GLUT_DOWN depending on whether the mouse was released
     *						or pressed respectivly. 
@@ -411,7 +399,7 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
 }
 
 /*----------------------------------------------------------------------------------------
-    *	\brief	Эта функция вызывается каждый раз, когда мышка двигается и какая-то кнопка нажата.
+    *	\brief	Эта функция вызывается каждый раз, когда мышка двигается и какая-то кнопка мыши нажата.
     *	\param	x	-	новая x-координата мышки.
     *	\param	y	-	новая y-координата мышки.
     */
