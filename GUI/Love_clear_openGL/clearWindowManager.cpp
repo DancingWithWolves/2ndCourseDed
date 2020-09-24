@@ -1,18 +1,18 @@
 #pragma once
 
 #include <assert.h>
+#include <forward_list>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <forward_list>
 
 #define DEBUG
 
 #include <GL/glut.h>
 
 #define MSG_TO_LOG(format, args...)    \
-    FILE *log = fopen(log_name, "at"); \
+    FILE* log = fopen(log_name, "at"); \
     fprintf(log, format, ##args);      \
     fclose(log);
 
@@ -27,8 +27,7 @@ extern const int buttons_qty;
 
 const char log_name[] = "GUI.log";
 
-struct Mouse
-{
+struct Mouse {
     int x;
     int y;
     int left_button_pressed;
@@ -61,29 +60,29 @@ int window_height = 480;
     *	\param	x		-	Координата x (центр текста)
     *	\param	y		-	Координата y (центр текста)
     */
-void Font(void *font, char *text, int x, int y)
+void Font(void* font, char* text, int x, int y)
 {
     glRasterPos2i(x, y);
 
-    while (*text != '\0')
-    {
+    while (*text != '\0') {
         glutBitmapCharacter(font, *text);
         ++text;
     }
 }
 
-struct Drawable
-{
+struct Drawable {
 
     Drawable(int x = 0, int y = 0, int width = 0, int height = 0)
-        : x(x), y(y), width(width), height(height)
+        : x(x)
+        , y(y)
+        , width(width)
+        , height(height)
     {
     }
 
     bool CheckMouseOver(int mouse_x, int mouse_y)
     {
-        if (mouse_x > x && mouse_x < x + width && mouse_y > y && mouse_y < y + height)
-        {
+        if (mouse_x > x && mouse_x < x + width && mouse_y > y && mouse_y < y + height) {
             return true;
         }
 
@@ -95,15 +94,18 @@ struct Drawable
     int x, y, width, height;
 };
 
-std::forward_list<Drawable *> drawable_list;
+std::forward_list<Drawable*> drawable_list;
 
 typedef void (*Callback)();
 
-struct Clickable : public Drawable
-{
+struct Clickable : public Drawable {
 
     Clickable(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr)
-        : Drawable(x, y, width, height), callback(callback), pressed(false), highlighted(false), active(true)
+        : Drawable(x, y, width, height)
+        , callback(callback)
+        , pressed(false)
+        , highlighted(false)
+        , active(true)
     {
     }
 
@@ -116,55 +118,8 @@ protected:
     Callback callback;
 };
 
-template <typename T, typename E>
 
-struct Point {
-    T x;
-    E y;
-};
-
-template <typename T, typename E>
-
-struct Graph : public Drawable {
-
-
-public:
-const int min_width = 100, min_heigth = 100;
-const int axis_size = 20;
-Graph(char *x_name = nullptr, char *y_name = nullptr)
-{
-    
-    label_x = strdup(x_name);
-    label_y = strdup(y_name);
-}
-
-~Graph()
-{
-    free(label_x);
-    free(label_y);
-}
-
-Graph(const Graph &from)
-{
-    label_x = strdup(from.label_x);
-    label_y = strdup(from.label_y);
-}
-
-private:
-    const char *label_x, *label_y;
-    double scale_x, scale_y;
-
-    Point<T, E> *points;
-
-    void DrawAxis()
-    {
-
-    }
-
-};
-
-struct Button : public Clickable
-{
+struct Button : public Clickable {
     Button(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr, const char text[] = nullptr)
 
         : Clickable(x, y, width, height, callback)
@@ -181,31 +136,27 @@ struct Button : public Clickable
         --qty;
     }
 
-    Button(const Button &from)
+    Button(const Button& from)
         : Clickable(from)
     {
         id = qty++;
         label = strdup(from.label);
         ON_DEBUG(MSG_TO_LOG("Copied Button with id '%lu'!\n", id);)
     }
+
     void Passive(int mouse_x, int mouse_y)
     {
-        if (this->CheckMouseOver(mouse_x, mouse_y))
-        {
+        if (this->CheckMouseOver(mouse_x, mouse_y)) {
 
             // Если кнопка ещё не подсвечена, подсвечиваем путём glutPostRedisplay()
-            if (this->highlighted == 0)
-            {
+            if (this->highlighted == 0) {
                 this->highlighted = 1;
                 glutPostRedisplay();
             }
-        }
-        else
-        {
+        } else {
 
             // Если курсор ТОЛЬКО ЧТО покинул область кнопки, а она ещё подсвечена, перерисовываем её
-            if (this->highlighted)
-            {
+            if (this->highlighted) {
                 this->highlighted = false;
                 glutPostRedisplay();
             }
@@ -214,8 +165,7 @@ struct Button : public Clickable
 
     void OnPress(int mouse_x, int mouse_y)
     {
-        if (CheckMouseOver(mouse_x, mouse_y) && active)
-        {
+        if (CheckMouseOver(mouse_x, mouse_y) && active) {
             ON_DEBUG(MSG_TO_LOG("button[%lu]->active = %d\n", GetId(), active))
             pressed = true;
         }
@@ -223,9 +173,8 @@ struct Button : public Clickable
 
     void OnRelease(int mouse_x, int mouse_y)
     {
-        if (CheckMouseOver(TheMouse.xpress, TheMouse.ypress) && CheckMouseOver(mouse_x, mouse_y) && pressed)
-        {
-            ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%ld' Button pressed!\n", id);)
+        if (CheckMouseOver(TheMouse.xpress, TheMouse.ypress) && CheckMouseOver(mouse_x, mouse_y) && pressed) {
+            ON_DEBUG(MSG_TO_LOG("Meow there! I'm '%lu' Button pressed!\n", id);)
             callback();
         }
         pressed = false;
@@ -277,19 +226,17 @@ struct Button : public Clickable
         glLineWidth(1);
 
         // Вычисляем координаты строчки ровно по центру кнопки
-        fontx = this->x + (this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_10, reinterpret_cast<unsigned char *>(this->label))) / 2;
+        fontx = this->x + (this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_10, reinterpret_cast<unsigned char*>(this->label))) / 2;
         fonty = this->y + (this->height + 10) / 2;
 
         // Если кнопка нажата, смещаем текст вниз
-        if (this->pressed)
-        {
+        if (this->pressed) {
             fontx += 2;
             fonty += 2;
         }
 
         // Если курсор сейчас над кнопкой, мы смещаем текст и рисуем "тень"
-        if (this->highlighted)
-        {
+        if (this->highlighted) {
             glColor3f(0, 0, 0);
             ::Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
             fontx--;
@@ -303,23 +250,22 @@ struct Button : public Clickable
 private:
     static size_t qty;
     size_t id;
-    char *label;
+    char* label;
 };
 
 size_t Button::qty = 0;
 
-Button *buttons = nullptr;
-
+Button* buttons = nullptr;
 
 /*----------------------------------------------------------------------------------------
 *	Функция, отвечающая за отрисовку всех объектов на 2д-оверлей над 3д-полем.
 */
 void Draw2D()
 {
-    for (auto i : drawable_list)
-    {
+    for (auto i : drawable_list) {
         i->Draw();
     }
+
 }
 
 /*----------------------------------------------------------------------------------------
@@ -372,21 +318,17 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
     TheMouse.x = x;
     TheMouse.y = y;
 
-    if (pressed == GLUT_DOWN)
-    {
+    if (pressed == GLUT_DOWN) {
 
-        if (!(TheMouse.right_button_pressed || TheMouse.middle_button_pressed || TheMouse.right_button_pressed))
-        {
+        if (!(TheMouse.right_button_pressed || TheMouse.middle_button_pressed || TheMouse.right_button_pressed)) {
             TheMouse.xpress = x;
             TheMouse.ypress = y;
         }
 
-        switch (mouse_button)
-        {
+        switch (mouse_button) {
         case GLUT_LEFT_BUTTON:
             TheMouse.right_button_pressed = 1;
-            for (int i = 0; i < buttons_qty; ++i)
-            {
+            for (int i = 0; i < buttons_qty; ++i) {
                 buttons[i].OnPress(x, y);
             }
             break;
@@ -397,17 +339,13 @@ void MouseButton(int mouse_button, int pressed, int x, int y)
             TheMouse.right_button_pressed = 1;
             break;
         }
-    }
-    else
-    {
+    } else {
 
-        switch (mouse_button)
-        {
+        switch (mouse_button) {
         case GLUT_LEFT_BUTTON:
             TheMouse.right_button_pressed = 0;
 
-            for (int i = 0; i < buttons_qty; ++i)
-            {
+            for (int i = 0; i < buttons_qty; ++i) {
                 buttons[i].OnRelease(x, y);
             }
 
@@ -435,8 +373,7 @@ void MouseMotion(int x, int y)
     TheMouse.x = x;
     TheMouse.y = y;
 
-    for (int i = 0; i < buttons_qty; ++i)
-    {
+    for (int i = 0; i < buttons_qty; ++i) {
         buttons[i].Passive(x, y);
     }
 
@@ -455,8 +392,7 @@ void MousePassiveMotion(int x, int y)
     TheMouse.y = y;
 
     //	Проверяем, не подсветить ли кнопки
-    for (int i = 0; i < buttons_qty; ++i)
-    {
+    for (int i = 0; i < buttons_qty; ++i) {
         buttons[i].Passive(x, y);
     }
 }
