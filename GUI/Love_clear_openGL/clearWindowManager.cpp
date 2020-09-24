@@ -216,7 +216,7 @@ struct Button : public Clickable
     {
         if (CheckMouseOver(mouse_x, mouse_y) && active)
         {
-            ON_DEBUG(MSG_TO_LOG("button[%d]->active = %d\n", GetId(), active))
+            ON_DEBUG(MSG_TO_LOG("button[%lu]->active = %d\n", GetId(), active))
             pressed = true;
         }
     }

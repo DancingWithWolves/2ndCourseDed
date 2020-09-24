@@ -11,7 +11,7 @@ build : $(OBJS)
 	$(COMPILE) $(OBJS) $(LIBS)
 	
 $(OBJS) : main.cpp
-	$(COMPILE) main.cpp -c -o $@ 
+	$(COMPILE) main.cpp -c -o $@ -Werror
 	
 clean :
 	rm -f *.o 
