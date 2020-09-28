@@ -279,10 +279,10 @@ void Draw()
     glLoadIdentity();
     glOrtho(0, window_width, window_height, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
 
     Draw2D();
 
+    glLoadIdentity();
     glutSwapBuffers();
 }
 
@@ -291,6 +291,7 @@ void Draw()
     */
 void Resize(int w, int h)
 {
+    if (h == 0) h = 1; //Чтобы на 0 не поделить ненароком
     window_width = w;
     window_height = h;
 
