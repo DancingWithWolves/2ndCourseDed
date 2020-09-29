@@ -24,8 +24,9 @@
 #endif
 
 
-// Количество кнопок
 extern const int buttons_qty;
+
+extern const int graphs_qty;
 
 const char log_name[] = "GUI.log";
 
@@ -155,7 +156,7 @@ struct Graph : public Drawable {
         this->x_axis_text = strdup(x_axis_text);
         this->y_axis_text = strdup(y_axis_text);
 
-        TellMeEverythingYouKnow();
+        TellMeEverythingIWannaHear();
     }
 
     Graph(const Graph& from)
@@ -183,7 +184,7 @@ struct Graph : public Drawable {
 
     void Draw()
     {
-        glColor3f(BUTTON_HIGHLITED_COLOR);
+        glColor3f(BUTTON_COLOR);
 
         glBegin(GL_QUADS);
         glVertex2i(this->x, this->y);
@@ -195,8 +196,7 @@ struct Graph : public Drawable {
 
 private:
 
-// Если включён дебаг, записывает весь текст в глобальный буфер fmt, все аргументы -- в глобальный буфер args
-    void TellMeEverythingYouKnow()
+    void TellMeEverythingIWannaHear()
     {
 #ifndef DEBUG
         return nullptr;
@@ -226,10 +226,10 @@ private:
         
         
         for (size_t i = 0; i < points_qty; ++i) {
-            printf("\t\tpoints[%lu]: x = %d, y = %d\n", i, points[i].x, points[i].y);
+            printf("\t\tpoints[%lu]: x = %d, y = %d\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
         }
 
-        fprintf(log, "\n\n==========================================================/\n\n");
+        fprintf(log, "\n==========================================================/\n\n");
         fclose(log);
         
     }
@@ -242,6 +242,8 @@ private:
     char* x_axis_text;
     char* y_axis_text;
 };
+
+
 
 // Имплементация кнопки
 typedef void (*Callback)();
@@ -444,23 +446,24 @@ void Draw()
 /*----------------------------------------------------------------------------------------
     *	Эта функция вызывается при изменении размеров экрана. "Под капотом" вызывает Draw().
     */
-void Resize(int w, int h)
+void Resize(int widht, int height)
 {
-    if (h == 0)
-        h = 1; //Чтобы на 0 не поделить ненароком
-    window_width = w;
-    window_height = h;
+    if (height == 0)
+        height = 1; //Чтобы на 0 не поделить ненароком
+    window_width = widht;
+    window_height = height;
 
-    buttons[0].width = window_width / 3 - 12; // TODO: написать в общем случае
-    buttons[1].width = window_width / 3 - 12;
-    buttons[2].width = window_width / 3 - 12;
+    int new_button_width = window_width / 3 - 12;
 
-    buttons[1].x = window_width / 3 + 5;
-    buttons[2].x = window_width * 2 / 3 + 5;
-
+    for (size_t i = 0; i < buttons_qty; ++i) {
+        buttons[i].width = new_button_width;
+        if (i >= 1) {
+            buttons[i].x = window_width / 3 * i + 5;
+        }
+    }
     
-
-    glViewport(0, 0, w, h);
+    
+    glViewport(0, 0, widht, height);
 }
 
 /*----------------------------------------------------------------------------------------

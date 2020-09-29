@@ -19,6 +19,8 @@ const int graph_height = 250;
 
 const int buttons_qty = 3;
 
+const int graphs_qty = 2;
+
 
 
 /*!
@@ -132,7 +134,18 @@ int main(int argc, char** argv)
         , "arffff"
         );
 
+    auto graph2 = Graph<int, int>
+        ( default_margin + graph1.width + 2 * default_margin
+        , graph1.y
+        , graph1.width
+        , graph_height
+        , "123"
+        , "12345"
+        , "123456"
+        );
+
     drawable_list.push_front(&graph1);
+    drawable_list.push_front(&graph2);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
