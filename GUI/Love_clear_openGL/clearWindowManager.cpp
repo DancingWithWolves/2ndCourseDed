@@ -23,10 +23,6 @@
 #define ON_DEBUG(param) ;
 #endif
 
-#ifdef DEBUG
-char fmt[1000];
-char args[1000];
-#endif
 
 // Количество кнопок
 extern const int buttons_qty;
@@ -46,6 +42,10 @@ struct Mouse {
 };
 // TODO: правило трёх
 Mouse TheMouse = Mouse(); //дефолтный конструктор всё занулит, благо, типы примитивные
+
+const char default_label[] = "график";
+const char default_x_text[] = "x";
+const char default_y_text[] = "y";
 
 int window_width = 640;
 int window_height = 480;
@@ -134,7 +134,7 @@ template <typename X_t, typename Y_t>
 
 struct Graph : public Drawable {
 
-    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = nullptr, const char* x_axis_text = nullptr, const char* y_axis_text = nullptr, const X_t* x_values = nullptr, const Y_t* y_values = nullptr, const size_t points_qty = 0)
+    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_x_text, const char* y_axis_text = default_y_text, const X_t* x_values = nullptr, const Y_t* y_values = nullptr, const size_t points_qty = 0)
 
         : Drawable(x, y, width, height)
         , points_qty(points_qty)
@@ -156,8 +156,6 @@ struct Graph : public Drawable {
         this->y_axis_text = strdup(y_axis_text);
 
         TellMeEverythingYouKnow();
-        ON_DEBUG(MSG_TO_LOG(fmt, args))
-        printf("%s\n", args);
     }
 
     Graph(const Graph& from)
@@ -203,52 +201,37 @@ private:
 #ifndef DEBUG
         return nullptr;
 #endif
+        FILE *log = fopen(log_name, "at");
+        fprintf(log, "\n\n==========================================================\\\n\n");
 
-        char* fmt_ = fmt;
-        char* args_ = args;
-
-
-        fmt_ += sprintf(fmt_, "Meow there! I am graph\n");
-
-        fmt_ += sprintf(fmt_, "\tthis->x = \%d;\n");
-        args_ += sprintf(args_, ", %d", this->x);
+        fprintf(log, "Meow there! I am graph [%p].\n", this);
         
+        fprintf(log, "\tthis->x = %d;\n", this->x);
+        
+        fprintf(log, "\tthis->y = %d;\n", this->y);
+        
+        fprintf(log, "\tthis->width = %d;\n", this->width);
+        
+        fprintf(log, "\tthis->height = %d;\n", this->height);
+        
+        fprintf(log, "\tthis->points_qty = %lu;\n", this->points_qty);
+        
+        fprintf(log, "\tthis->label[%p] = %s;\n", this->label, this->label);
+        
+        fprintf(log, "\tthis->x_axis_text[%p] = %s;\n", this->x_axis_text, this->x_axis_text);
+        
+        fprintf(log, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
-        fmt_ += sprintf(fmt_, "\tthis->y = \%d;\n");
-        args_ += sprintf(args_, ", %d", this->y);
-
-        fmt_ += sprintf(fmt_, "\tthis->width = \%d;\n");
-        args_ += sprintf(args_, ", %d", this->width);
-
-        fmt_ += sprintf(fmt_, "\tthis->height = \%d;\n");
-        args_ += sprintf(args_, ", %d", this->height);
-
-        fmt_ += sprintf(fmt_, "\tthis->points_qty = \%lu;\n");
-        args_ += sprintf(args_, ", %lu", this->points_qty);
-
-        fmt_ += sprintf(fmt_, "\tthis->label = \%s;\n");
-        args_ += sprintf(args_, ", %s", this->label);
-
-        fmt_ += sprintf(fmt_, "\tthis->x_axis_text = \%s;\n");
-        args_ += sprintf(args_, ", %s", this->x_axis_text);
-
-        fmt_ += sprintf(fmt_, "\tthis->y_axis_text = \%s;\n");
-        args_ += sprintf(args_, ", %s", this->y_axis_text);
-
-
-        fmt_ += sprintf(fmt_, "\tthis->points = %d;\n");
+        fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
+        
+        
         for (size_t i = 0; i < points_qty; ++i) {
-            fmt_ += sprintf(fmt_, "\tpoints[%lu]: x = %d, y = %d\n");
-            args_ += sprintf(args_, ", %lu, %d, %d", i, points[i].x, points[i].y);
+            printf("\t\tpoints[%lu]: x = %d, y = %d\n", i, points[i].x, points[i].y);
         }
-        
-        
-        
 
+        fprintf(log, "\n\n==========================================================/\n\n");
+        fclose(log);
         
-
-
-        fmt_ += sprintf(fmt_, "\"");
     }
 
     const size_t points_qty;

@@ -1,0 +1,24 @@
+Created button with id '0'!
+Created button with id '1'!
+Created button with id '2'!
+
+
+==========================================================\
+
+Meow there! I am graph [0x7ffc09188e40].
+	this->x = 5;
+	this->y = 75;
+	this->width = 310;
+	this->height = 250;
+	this->points_qty = 0;
+	this->label[0x564e5757ad40] = arf;
+	this->x_axis_text[0x564e5757ad60] = arfff;
+	this->y_axis_text[0x564e5757ad80] = arffff;
+	this->points[0x564e5757ad20] = 0;
+
+
+==========================================================/
+
+Deleted button [0x564e5757a9d0] with id '0' and label 'Bubble sort'!
+Deleted button [0x564e5757aa08] with id '1' and label 'Insertion sort'!
+Deleted button [0x564e5757aa40] with id '2' and label 'Quick sort'!
