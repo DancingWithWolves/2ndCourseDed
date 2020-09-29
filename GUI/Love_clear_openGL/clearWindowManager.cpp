@@ -9,6 +9,7 @@
 
 #define DEBUG
 
+#include "clearWindowManager.h"
 #include <GL/glut.h>
 
 #define MSG_TO_LOG(format, args...)    \
@@ -20,6 +21,11 @@
 #define ON_DEBUG(param) param
 #else
 #define ON_DEBUG(param) ;
+#endif
+
+#ifdef DEBUG
+char fmt[1000];
+char args[1000];
 #endif
 
 // Количество кнопок
@@ -80,6 +86,14 @@ struct Drawable {
     {
     }
 
+    Drawable(const Drawable& from)
+        : x(from.x)
+        , y(from.y)
+        , width(from.width)
+        , height(from.height)
+    {
+    }
+
     bool CheckMouseOver(int mouse_x, int mouse_y)
     {
         if (mouse_x > x && mouse_x < x + width && mouse_y > y && mouse_y < y + height) {
@@ -96,6 +110,157 @@ struct Drawable {
 
 std::forward_list<Drawable*> drawable_list;
 
+// Вспомогательная структура для графика
+template <typename X_t, typename Y_t>
+
+struct Point {
+    X_t x;
+    Y_t y;
+    Point()
+        : x(X_t())
+        , y(Y_t())
+    {
+    }
+
+    Point(const X_t& x, const Y_t& y)
+        : x(x)
+        , y(y)
+    {
+    }
+};
+
+// Имплементация графика
+template <typename X_t, typename Y_t>
+
+struct Graph : public Drawable {
+
+    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = nullptr, const char* x_axis_text = nullptr, const char* y_axis_text = nullptr, const X_t* x_values = nullptr, const Y_t* y_values = nullptr, const size_t points_qty = 0)
+
+        : Drawable(x, y, width, height)
+        , points_qty(points_qty)
+    {
+        if (points_qty > 0) {
+            assert(x_values);
+            assert(y_values);
+        }
+
+        points = reinterpret_cast<Point<X_t, Y_t>*>(::operator new(sizeof(Point<X_t, Y_t>) * points_qty));
+
+        Point<X_t, Y_t>* tmp_point = nullptr;
+        for (size_t i = 0; i < points_qty; ++i)
+            tmp_point = new (points + i) Point<X_t, Y_t>(x_values[i], y_values[i]);
+
+        this->label = strdup(label);
+
+        this->x_axis_text = strdup(x_axis_text);
+        this->y_axis_text = strdup(y_axis_text);
+
+        TellMeEverythingYouKnow();
+        ON_DEBUG(MSG_TO_LOG(fmt, args))
+        printf("%s\n", args);
+    }
+
+    Graph(const Graph& from)
+        : Drawable(from)
+        , points_qty(from.points_qty)
+    {
+        this->label = strdup(from.label);
+
+        this->x_axis_text = strdup(from.x_axis_text);
+        this->y_axis_text = strdup(from.y_axis_text);
+
+        this->points = reinterpret_cast<Point<X_t, Y_t>*>(::operator new(sizeof(Point<X_t, Y_t>) * from.points_qty));
+        memcpy(this->points, from.points, sizeof(Point<X_t, Y_t>) * from.points_qty);
+
+    }
+
+    ~Graph()
+    {
+        free(label);
+        free(x_axis_text);
+        free(y_axis_text);
+
+        ::operator delete(points);
+    }
+
+    void Draw()
+    {
+        glColor3f(BUTTON_HIGHLITED_COLOR);
+
+        glBegin(GL_QUADS);
+        glVertex2i(this->x, this->y);
+        glVertex2i(this->x, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y + this->height);
+        glVertex2i(this->x + this->width, this->y);
+        glEnd();
+    }
+
+private:
+
+// Если включён дебаг, записывает весь текст в глобальный буфер fmt, все аргументы -- в глобальный буфер args
+    void TellMeEverythingYouKnow()
+    {
+#ifndef DEBUG
+        return nullptr;
+#endif
+
+        char* fmt_ = fmt;
+        char* args_ = args;
+
+
+        fmt_ += sprintf(fmt_, "Meow there! I am graph\n");
+
+        fmt_ += sprintf(fmt_, "\tthis->x = \%d;\n");
+        args_ += sprintf(args_, ", %d", this->x);
+        
+
+        fmt_ += sprintf(fmt_, "\tthis->y = \%d;\n");
+        args_ += sprintf(args_, ", %d", this->y);
+
+        fmt_ += sprintf(fmt_, "\tthis->width = \%d;\n");
+        args_ += sprintf(args_, ", %d", this->width);
+
+        fmt_ += sprintf(fmt_, "\tthis->height = \%d;\n");
+        args_ += sprintf(args_, ", %d", this->height);
+
+        fmt_ += sprintf(fmt_, "\tthis->points_qty = \%lu;\n");
+        args_ += sprintf(args_, ", %lu", this->points_qty);
+
+        fmt_ += sprintf(fmt_, "\tthis->label = \%s;\n");
+        args_ += sprintf(args_, ", %s", this->label);
+
+        fmt_ += sprintf(fmt_, "\tthis->x_axis_text = \%s;\n");
+        args_ += sprintf(args_, ", %s", this->x_axis_text);
+
+        fmt_ += sprintf(fmt_, "\tthis->y_axis_text = \%s;\n");
+        args_ += sprintf(args_, ", %s", this->y_axis_text);
+
+
+        fmt_ += sprintf(fmt_, "\tthis->points = %d;\n");
+        for (size_t i = 0; i < points_qty; ++i) {
+            fmt_ += sprintf(fmt_, "\tpoints[%lu]: x = %d, y = %d\n");
+            args_ += sprintf(args_, ", %lu, %d, %d", i, points[i].x, points[i].y);
+        }
+        
+        
+        
+
+        
+
+
+        fmt_ += sprintf(fmt_, "\"");
+    }
+
+    const size_t points_qty;
+    Point<X_t, Y_t>* points;
+
+    char* label;
+
+    char* x_axis_text;
+    char* y_axis_text;
+};
+
+// Имплементация кнопки
 typedef void (*Callback)();
 
 struct Clickable : public Drawable {
@@ -103,6 +268,15 @@ struct Clickable : public Drawable {
     Clickable(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr)
         : Drawable(x, y, width, height)
         , callback(callback)
+        , pressed(false)
+        , highlighted(false)
+        , active(true)
+    {
+    }
+
+    Clickable(const Clickable& from)
+        : Drawable(from.x, from.y, from.width, from.height)
+        , callback(from.callback)
         , pressed(false)
         , highlighted(false)
         , active(true)
@@ -118,9 +292,8 @@ protected:
     Callback callback;
 };
 
-
 struct Button : public Clickable {
-    Button(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr, const char text[] = nullptr)
+    Button(int x = 0, int y = 0, int width = 0, int height = 0, Callback callback = nullptr, const char* text = nullptr)
 
         : Clickable(x, y, width, height, callback)
     {
@@ -188,9 +361,9 @@ struct Button : public Clickable {
 
         // Меняем цвет кнопки, если она под курсором
         if (this->highlighted)
-            glColor3f(0.7f, 0.7f, 0.8f);
+            glColor3f(BUTTON_HIGHLITED_COLOR);
         else
-            glColor3f(0.6f, 0.6f, 0.6f);
+            glColor3f(BUTTON_COLOR);
 
         glBegin(GL_QUADS);
         glVertex2i(this->x, this->y);
@@ -202,9 +375,9 @@ struct Button : public Clickable {
         glLineWidth(3);
 
         if (this->pressed)
-            glColor3f(0.4f, 0.4f, 0.4f);
+            glColor3f(STRIP_COLOR_2);
         else
-            glColor3f(0.8f, 0.8f, 0.8f);
+            glColor3f(STRIP_COLOR_1);
 
         glBegin(GL_LINE_STRIP);
         glVertex2i(this->x + this->width, this->y);
@@ -213,9 +386,9 @@ struct Button : public Clickable {
         glEnd();
 
         if (this->pressed)
-            glColor3f(0.8f, 0.8f, 0.8f);
+            glColor3f(STRIP_COLOR_1);
         else
-            glColor3f(0.4f, 0.4f, 0.4f);
+            glColor3f(STRIP_COLOR_2);
 
         glBegin(GL_LINE_STRIP);
         glVertex2i(this->x, this->y + this->height);
@@ -265,7 +438,6 @@ void Draw2D()
     for (auto i : drawable_list) {
         i->Draw();
     }
-
 }
 
 /*----------------------------------------------------------------------------------------
@@ -291,7 +463,8 @@ void Draw()
     */
 void Resize(int w, int h)
 {
-    if (h == 0) h = 1; //Чтобы на 0 не поделить ненароком
+    if (h == 0)
+        h = 1; //Чтобы на 0 не поделить ненароком
     window_width = w;
     window_height = h;
 
@@ -301,6 +474,8 @@ void Resize(int w, int h)
 
     buttons[1].x = window_width / 3 + 5;
     buttons[2].x = window_width * 2 / 3 + 5;
+
+    
 
     glViewport(0, 0, w, h);
 }

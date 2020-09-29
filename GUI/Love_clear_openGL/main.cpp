@@ -15,6 +15,8 @@ const int default_margin = 5;
 
 const int button_height = 55;
 
+const int graph_height = 250;
+
 const int buttons_qty = 3;
 
 
@@ -119,6 +121,19 @@ int main(int argc, char** argv)
     for (int i = 0; i < buttons_qty; ++i) {
         drawable_list.push_front(&buttons[i]);
     }
+
+    auto graph1 = Graph<int, int>
+        ( default_margin
+        , button_height + default_margin * 4 
+        , window_width / 2 - 2 * default_margin
+        , graph_height
+        , "arf"
+        , "arfff"
+        , "arffff"
+        );
+
+    drawable_list.push_front(&graph1);
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(window_width, window_height);
