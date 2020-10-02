@@ -132,6 +132,56 @@ struct Point {
 
 struct GraphManager : public Drawable {
 
+    struct Graph {
+        
+        const size_t points_qty;
+        Point* points;
+        float y_max;
+
+        void SetPoints(size_t points_qty, const float *x_values, const float *y_values)
+        {
+            assert(x_values);
+            assert(y_values);
+            assert(points_qty > 0);
+
+            Point* tmp_point = nullptr;
+
+            for (size_t i = 0; i < points_qty; ++i)
+                tmp_point = new (points + i) Point(x_values[i], y_values[i]);
+
+            if (points_qty != 0 && points[points_qty-1].x == 0) {
+                ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s x_max = 0! Set it to 1.", this))
+                points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
+            }
+
+            for (int i = 0; i < points_qty; ++i) {
+                if (points[i].y > y_max)
+                    y_max = points[i].y; 
+            }
+
+            if (y_max == 0) {
+                ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s y_max = 0! Set it to 1.", this))
+                y_max = 1;
+            }
+        }
+
+        void Draw(const int x, const int y, const int width, const int height)
+        {
+            const float dx = width / points[points_qty-1].x;
+            const float dy = height / y_max;
+
+            glColor3f(1,1,1);
+
+            glBegin(GL_LINE_STRIP);
+
+            for (size_t i = 0; i < points_qty; ++i) {
+                glVertex2i(x + points[i].x * dx, y + height - points[i].y * dy);
+            }
+
+            glEnd();
+        }
+    };
+
     GraphManager(int x = 0
     , int y = 0
     , int width = 0
@@ -139,24 +189,10 @@ struct GraphManager : public Drawable {
     , const char* label = default_label
     , const char* x_axis_text = default_x_text
     , const char* y_axis_text = default_y_text
-    , const float* x_values = nullptr
-    , const float* y_values = nullptr
-    , const size_t points_qty = 0)
-
+    )
         : Drawable(x, y, width, height)
-        , points_qty(points_qty)
+        , graphs_qty(0)
     {
-        if (points_qty > 0) {
-            assert(x_values);
-            assert(y_values);
-        }
-
-        // points identification
-        points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * points_qty));
-        
-        if (x_values && y_values && points_qty > 0) {
-            SetPoints(points_qty, x_values, y_values);
-        }
 
         this->label = strdup(label);
 
@@ -168,15 +204,15 @@ struct GraphManager : public Drawable {
 
     GraphManager(const GraphManager& from)
         : Drawable(from)
-        , points_qty(from.points_qty)
+        , graphs_qty(from.graphs_qty)
     {
         this->label = strdup(from.label);
 
         this->x_axis_text = strdup(from.x_axis_text);
         this->y_axis_text = strdup(from.y_axis_text);
 
-        this->points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * from.points_qty));
-        memcpy(this->points, from.points, sizeof(Point) * from.points_qty);
+        this->graphs = reinterpret_cast<Graph*>(::operator new(sizeof(Graph) * from.graphs_qty));
+        memcpy(this->graphs, from.graphs, sizeof(Graph) * from.graphs_qty);
     }
 
     ~GraphManager()
@@ -188,32 +224,7 @@ struct GraphManager : public Drawable {
         ::operator delete(points);
     }
 
-    void SetPoints(size_t points_qty, const float *x_values, const float *y_values)
-    {
-        assert(x_values);
-        assert(y_values);
-        assert(points_qty > 0);
-
-        Point* tmp_point = nullptr;
-
-        for (size_t i = 0; i < points_qty; ++i)
-            tmp_point = new (points + i) Point(x_values[i], y_values[i]);
-
-        if (points_qty != 0 && points[points_qty-1].x == 0) {
-            ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s x_max = 0! Set it to 1.", this))
-            points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
-        }
-
-        for (int i = 0; i < points_qty; ++i) {
-            if (points[i].y > y_max)
-                y_max = points[i].y; 
-        }
-
-        if (y_max == 0) {
-            ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s y_max = 0! Set it to 1.", this))
-            y_max = 1;
-        }
-    }
+    
 
     void Draw()
     {
@@ -226,21 +237,10 @@ struct GraphManager : public Drawable {
         glVertex2i(this->x + this->width, this->y);
         glEnd();
 
-        
-        const float dx = this->width / points[points_qty-1].x;
-        const float dy = this->height / y_max;
-
-        glColor3f(1,1,1);
-
-        glBegin(GL_LINE_STRIP);
-
-        for (size_t i = 0; i < points_qty; ++i) {
-            glVertex2i(this->x + points[i].x * dx, this->y + this->height - points[i].y * dy);
+        for (auto &graph : graphs) {
+            graph.Draw(this->x, this->y, this->width, this->height);
         }
-
-        glEnd();
-
-        
+                
     }
 
 private:
@@ -262,7 +262,7 @@ private:
 
         fprintf(log, "\tthis->height = %d;\n", this->height);
 
-        fprintf(log, "\tthis->points_qty = %lu;\n", this->points_qty);
+        // fprintf(log, "\tthis->points_qty = %lu;\n", this->points_qty);
 
         fprintf(log, "\tthis->label[%p] = %s;\n", this->label, this->label);
 
@@ -270,27 +270,26 @@ private:
 
         fprintf(log, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
-        fprintf(log, "\tthis->y_max = %lf;\n", this->y_max);
+        // fprintf(log, "\tthis->y_max = %lf;\n", this->y_max);
 
-        fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
+        // fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
 
-        for (size_t i = 0; i < points_qty; ++i) {
-            fprintf(log, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
-        }
+        // for (size_t i = 0; i < points_qty; ++i) {
+        //     fprintf(log, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
+        // }
 
         fprintf(log, "\n==========================================================/\n\n");
         fclose(log);
     }
 
-    const size_t points_qty;
-    Point* points;
 
     char* label;
 
     char* x_axis_text;
     char* y_axis_text;
 
-    float y_max = 0;
+    std::forward_list<Graph> graphs;
+    int graphs_qty;
 };
 
 // Имплементация кнопки
