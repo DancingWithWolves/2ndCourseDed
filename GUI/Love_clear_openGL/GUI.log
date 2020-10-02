@@ -5,40 +5,43 @@ Created button with id '2'!
 
 ==========================================================\
 
-Meow there! I am graph [0x7ffdbd4e1060].
+Meow there! I am graph [0x565372a68d20].
 	this->x = 5;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
-	this->points_qty = 0;
-	this->label[0x563136ef7d40] = arf;
-	this->x_axis_text[0x563136ef7d60] = arfff;
-	this->y_axis_text[0x563136ef7d80] = arffff;
-	this->points[0x563136ef7d20] = 0;
+	this->points_qty = 5;
+	this->label[0x565372a68df0] = arf;
+	this->x_axis_text[0x565372a68e10] = arfff;
+	this->y_axis_text[0x565372a68e30] = arffff;
+	this->y_max = 6.000000;
+	this->points[0x565372a68dc0] = 0;
+		points[0]: x = 0.000000, y = 2.000000
+		points[1]: x = 1.000000, y = 3.000000
+		points[2]: x = 2.000000, y = 4.000000
+		points[3]: x = 3.000000, y = 5.000000
+		points[4]: x = 4.000000, y = 6.000000
 
 ==========================================================/
 
-
+Graph[0x565372a68d68]'s y_max = 0! Change to 1.
 
 ==========================================================\
 
-Meow there! I am graph [0x7ffdbd4e10a0].
+Meow there! I am graph [0x565372a68d68].
 	this->x = 325;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
 	this->points_qty = 0;
-	this->label[0x563136ef7dc0] = 123;
-	this->x_axis_text[0x563136ef7de0] = 12345;
-	this->y_axis_text[0x563136ef7e00] = 123456;
-	this->points[0x563136ef7da0] = 0;
+	this->label[0x565372a68e70] = 123;
+	this->x_axis_text[0x565372a68e90] = 12345;
+	this->y_axis_text[0x565372a68eb0] = 123456;
+	this->y_max = 1.000000;
+	this->points[0x565372a68e50] = 0;
 
 ==========================================================/
 
-button[1]->active = 1
-Meow there! I'm '1' Button pressed!
-button[0]->active = 1
-Meow there! I'm '0' Button pressed!
-Deleted button [0x563136ef79d0] with id '0' and label 'Bubble sort'!
-Deleted button [0x563136ef7a08] with id '1' and label 'Insertion sort'!
-Deleted button [0x563136ef7a40] with id '2' and label 'Quick sort'!
+Deleted button [0x565372a689d0] with id '0' and label 'Bubble sort'!
+Deleted button [0x565372a68a08] with id '1' and label 'Insertion sort'!
+Deleted button [0x565372a68a40] with id '2' and label 'Quick sort'!

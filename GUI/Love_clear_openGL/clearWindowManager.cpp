@@ -9,7 +9,8 @@
 
 #define DEBUG
 
-#include "clearWindowManager.h"
+#include "layoutConstants.h"
+
 #include <GL/glut.h>
 
 #define MSG_TO_LOG(format, args...)    \
@@ -44,8 +45,8 @@ struct Mouse {
 Mouse TheMouse = Mouse(); //дефолтный конструктор всё занулит, благо, типы примитивные
 
 const char default_label[] = "график";
-const char default_floatext[] = "x";
-const char default_floatext[] = "y";
+const char default_x_text[] = "x";
+const char default_y_text[] = "y";
 
 int window_width = 640;
 int window_height = 480;
@@ -131,7 +132,16 @@ struct Point {
 
 struct Graph : public Drawable {
 
-    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_floatext, const char* y_axis_text = default_floatext, const float* x_values = nullptr, const float* y_values = nullptr, const size_t points_qty = 0)
+    Graph(int x = 0
+    , int y = 0
+    , int width = 0
+    , int height = 0
+    , const char* label = default_label
+    , const char* x_axis_text = default_x_text
+    , const char* y_axis_text = default_y_text
+    , const float* x_values = nullptr
+    , const float* y_values = nullptr
+    , const size_t points_qty = 0)
 
         : Drawable(x, y, width, height)
         , points_qty(points_qty)
@@ -147,10 +157,25 @@ struct Graph : public Drawable {
         for (size_t i = 0; i < points_qty; ++i)
             tmp_point = new (points + i) Point(x_values[i], y_values[i]);
 
+        if (points_qty != 0 && points[points_qty-1].x == 0) {
+            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Change to 1.", this))
+            points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
+        }
+
         this->label = strdup(label);
 
         this->x_axis_text = strdup(x_axis_text);
         this->y_axis_text = strdup(y_axis_text);
+
+        for (int i = 0; i < points_qty; ++i) {
+            if (points[i].y > y_max)
+                y_max = points[i].y; 
+        }
+
+        if (y_max == 0) {
+            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s y_max = 0! Change to 1.", this))
+            y_max = 1;
+        }
 
         TellMeEverythingIWannaHear();
     }
@@ -187,6 +212,22 @@ struct Graph : public Drawable {
         glVertex2i(this->x + this->width, this->y + this->height);
         glVertex2i(this->x + this->width, this->y);
         glEnd();
+
+        
+        const float dx = this->width / points[points_qty-1].x;
+        const float dy = this->height / y_max;
+
+        glColor3f(1,1,1);
+
+        glBegin(GL_LINE_STRIP);
+
+        for (size_t i = 0; i < points_qty; ++i) {
+            glVertex2i(this->x + points[i].x * dx, this->y + this->height - points[i].y * dy);
+        }
+
+        glEnd();
+
+        
     }
 
 private:
@@ -216,10 +257,12 @@ private:
 
         fprintf(log, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
+        fprintf(log, "\tthis->y_max = %lf;\n", this->y_max);
+
         fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
 
         for (size_t i = 0; i < points_qty; ++i) {
-            printf("\t\tpoints[%lu]: x = %d, y = %d\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
+            fprintf(log, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
         }
 
         fprintf(log, "\n==========================================================/\n\n");
@@ -233,6 +276,8 @@ private:
 
     char* x_axis_text;
     char* y_axis_text;
+
+    float y_max = 0;
 };
 
 // Имплементация кнопки
@@ -405,6 +450,8 @@ size_t Button::qty = 0;
 
 Button* buttons = nullptr;
 
+Graph* graphs = nullptr;
+
 /*----------------------------------------------------------------------------------------
 *	Функция, отвечающая за отрисовку всех объектов на 2д-оверлей над 3д-полем.
 */
@@ -452,6 +499,17 @@ void Resize(int widht, int height)
         }
     }
 
+    int new_graphs_width = std::min(window_width / 2 - 2 * default_margin, window_height - button_height - 5 * default_margin);
+
+    for ( int i = 0; i < graphs_qty; ++i ) {
+        graphs[i].width = new_graphs_width;
+        graphs[i].height = new_graphs_width;
+    }
+    graphs[0].x = window_width / 2 - default_margin - new_graphs_width;
+    graphs[1].x = window_width / 2 + default_margin;
+
+
+    
     glViewport(0, 0, widht, height);
 }
 

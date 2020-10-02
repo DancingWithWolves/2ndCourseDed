@@ -1,5 +1,5 @@
 #include "sortFunctions.h"
-// #include "windowManager.h"
+#include "layoutConstants.h"
 #include "clearWindowManager.cpp"
 #include <stdio.h>
 
@@ -11,15 +11,15 @@
 int compares_qty = 0, swaps_qty = 0;
 
 
-const int default_margin = 5;
+extern const int default_margin;
 
-const int button_height = 55;
+extern const int button_height;
 
-const int graph_height = 250;
+extern const int graph_height;
 
-const int buttons_qty = 3;
+extern const int buttons_qty;
 
-const int graphs_qty = 2;
+extern const int graphs_qty;
 
 
 
@@ -124,7 +124,14 @@ int main(int argc, char** argv)
         drawable_list.push_front(&buttons[i]);
     }
 
-    auto graph1 = Graph
+
+    float x[] = {0, 1, 2, 3, 4};
+    float y[] = {2, 3, 4, 5, 6};
+
+    graphs = reinterpret_cast<Graph*>(::operator new(sizeof(Graph) * graphs_qty));
+
+    Graph* graph = nullptr;
+    graph = new (graphs) Graph
         ( default_margin
         , button_height + default_margin * 4 
         , window_width / 2 - 2 * default_margin
@@ -132,20 +139,25 @@ int main(int argc, char** argv)
         , "arf"
         , "arfff"
         , "arffff"
+        , x
+        , y
+        , 5
         );
 
-    auto graph2 = Graph
-        ( default_margin + graph1.width + 2 * default_margin
-        , graph1.y
-        , graph1.width
+    graph = new (graphs + 1) Graph
+        ( default_margin + graphs[0].width + 2 * default_margin
+        , graph[0].y
+        , graph[0].width
         , graph_height
         , "123"
         , "12345"
         , "123456"
         );
 
-    drawable_list.push_front(&graph1);
-    drawable_list.push_front(&graph2);
+    // drawable_list.push_front(&graph1);
+    for (int i = 0; i < graphs_qty; ++i) {
+        drawable_list.push_front(&graphs[i]);
+    }
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
