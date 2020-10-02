@@ -151,31 +151,17 @@ struct Graph : public Drawable {
             assert(y_values);
         }
 
+        // points identification
         points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * points_qty));
-
-        Point* tmp_point = nullptr;
-        for (size_t i = 0; i < points_qty; ++i)
-            tmp_point = new (points + i) Point(x_values[i], y_values[i]);
-
-        if (points_qty != 0 && points[points_qty-1].x == 0) {
-            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Change to 1.", this))
-            points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
+        
+        if (x_values && y_values && points_qty > 0) {
+            SetPoints(points_qty, x_values, y_values);
         }
 
         this->label = strdup(label);
 
         this->x_axis_text = strdup(x_axis_text);
         this->y_axis_text = strdup(y_axis_text);
-
-        for (int i = 0; i < points_qty; ++i) {
-            if (points[i].y > y_max)
-                y_max = points[i].y; 
-        }
-
-        if (y_max == 0) {
-            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s y_max = 0! Change to 1.", this))
-            y_max = 1;
-        }
 
         TellMeEverythingIWannaHear();
     }
@@ -200,6 +186,33 @@ struct Graph : public Drawable {
         free(y_axis_text);
 
         ::operator delete(points);
+    }
+
+    void SetPoints(size_t points_qty, const float *x_values, const float *y_values)
+    {
+        assert(x_values);
+        assert(y_values);
+        assert(points_qty > 0);
+
+        Point* tmp_point = nullptr;
+
+        for (size_t i = 0; i < points_qty; ++i)
+            tmp_point = new (points + i) Point(x_values[i], y_values[i]);
+
+        if (points_qty != 0 && points[points_qty-1].x == 0) {
+            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Set it to 1.", this))
+            points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
+        }
+
+        for (int i = 0; i < points_qty; ++i) {
+            if (points[i].y > y_max)
+                y_max = points[i].y; 
+        }
+
+        if (y_max == 0) {
+            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s y_max = 0! Set it to 1.", this))
+            y_max = 1;
+        }
     }
 
     void Draw()

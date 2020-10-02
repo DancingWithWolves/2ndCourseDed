@@ -23,6 +23,7 @@ extern const int graphs_qty;
 
 
 
+
 /*!
  * Сравнивает 
  * @param elem_1 указатель на первый элемент
@@ -58,11 +59,22 @@ void Swap(void* elem_1, void* elem_2, int elem_size)
     ++swaps_qty;
 }
 
+void GenerateRandomArray(int n, int *arr)
+{
+    assert(arr);
+    assert(n > 0);
+    for (int i = 0; i < n; ++i) {
+        arr[i] = rand() % n;
+    }
+
+}
+
 /*!
 *  Обрабатывает функцию BubbleSort()
 */
 void ShowBubbleSortStat()
 {
+
 }
 
 /*!
@@ -88,6 +100,11 @@ void Clear()
         buttons[i].~Button();
     }
     ::operator delete(buttons);
+
+    for (int i = 0; i < graphs_qty; ++i) {
+        graphs[i].~Graph();
+    }
+    ::operator delete(graphs);
 }
 
 int main(int argc, char** argv)
@@ -125,8 +142,6 @@ int main(int argc, char** argv)
     }
 
 
-    float x[] = {0, 1, 2, 3, 4};
-    float y[] = {2, 3, 4, 5, 6};
 
     graphs = reinterpret_cast<Graph*>(::operator new(sizeof(Graph) * graphs_qty));
 
@@ -139,9 +154,6 @@ int main(int argc, char** argv)
         , "arf"
         , "arfff"
         , "arffff"
-        , x
-        , y
-        , 5
         );
 
     graph = new (graphs + 1) Graph
