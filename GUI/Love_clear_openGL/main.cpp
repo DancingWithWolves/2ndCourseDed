@@ -124,7 +124,7 @@ int main(int argc, char** argv)
         drawable_list.push_front(&buttons[i]);
     }
 
-    auto graph1 = Graph<int, int>
+    auto graph1 = Graph
         ( default_margin
         , button_height + default_margin * 4 
         , window_width / 2 - 2 * default_margin
@@ -134,7 +134,7 @@ int main(int argc, char** argv)
         , "arffff"
         );
 
-    auto graph2 = Graph<int, int>
+    auto graph2 = Graph
         ( default_margin + graph1.width + 2 * default_margin
         , graph1.y
         , graph1.width

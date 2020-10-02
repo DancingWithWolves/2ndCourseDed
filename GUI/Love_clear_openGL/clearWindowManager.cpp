@@ -23,7 +23,6 @@
 #define ON_DEBUG(param) ;
 #endif
 
-
 extern const int buttons_qty;
 
 extern const int graphs_qty;
@@ -45,8 +44,8 @@ struct Mouse {
 Mouse TheMouse = Mouse(); //дефолтный конструктор всё занулит, благо, типы примитивные
 
 const char default_label[] = "график";
-const char default_x_text[] = "x";
-const char default_y_text[] = "y";
+const char default_floatext[] = "x";
+const char default_floatext[] = "y";
 
 int window_width = 640;
 int window_height = 480;
@@ -112,18 +111,16 @@ struct Drawable {
 std::forward_list<Drawable*> drawable_list;
 
 // Вспомогательная структура для графика
-template <typename X_t, typename Y_t>
 
 struct Point {
-    X_t x;
-    Y_t y;
-    Point()
-        : x(X_t())
-        , y(Y_t())
+    float x;
+    float y;
+
+    Point() : x(0), y(0)
     {
     }
 
-    Point(const X_t& x, const Y_t& y)
+    Point(const float& x, const float& y)
         : x(x)
         , y(y)
     {
@@ -131,11 +128,10 @@ struct Point {
 };
 
 // Имплементация графика
-template <typename X_t, typename Y_t>
 
 struct Graph : public Drawable {
 
-    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_x_text, const char* y_axis_text = default_y_text, const X_t* x_values = nullptr, const Y_t* y_values = nullptr, const size_t points_qty = 0)
+    Graph(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_floatext, const char* y_axis_text = default_floatext, const float* x_values = nullptr, const float* y_values = nullptr, const size_t points_qty = 0)
 
         : Drawable(x, y, width, height)
         , points_qty(points_qty)
@@ -145,11 +141,11 @@ struct Graph : public Drawable {
             assert(y_values);
         }
 
-        points = reinterpret_cast<Point<X_t, Y_t>*>(::operator new(sizeof(Point<X_t, Y_t>) * points_qty));
+        points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * points_qty));
 
-        Point<X_t, Y_t>* tmp_point = nullptr;
+        Point* tmp_point = nullptr;
         for (size_t i = 0; i < points_qty; ++i)
-            tmp_point = new (points + i) Point<X_t, Y_t>(x_values[i], y_values[i]);
+            tmp_point = new (points + i) Point(x_values[i], y_values[i]);
 
         this->label = strdup(label);
 
@@ -168,9 +164,8 @@ struct Graph : public Drawable {
         this->x_axis_text = strdup(from.x_axis_text);
         this->y_axis_text = strdup(from.y_axis_text);
 
-        this->points = reinterpret_cast<Point<X_t, Y_t>*>(::operator new(sizeof(Point<X_t, Y_t>) * from.points_qty));
-        memcpy(this->points, from.points, sizeof(Point<X_t, Y_t>) * from.points_qty);
-
+        this->points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * from.points_qty));
+        memcpy(this->points, from.points, sizeof(Point) * from.points_qty);
     }
 
     ~Graph()
@@ -195,55 +190,50 @@ struct Graph : public Drawable {
     }
 
 private:
-
     void TellMeEverythingIWannaHear()
     {
 #ifndef DEBUG
         return nullptr;
 #endif
-        FILE *log = fopen(log_name, "at");
+        FILE* log = fopen(log_name, "at");
         fprintf(log, "\n\n==========================================================\\\n\n");
 
         fprintf(log, "Meow there! I am graph [%p].\n", this);
-        
+
         fprintf(log, "\tthis->x = %d;\n", this->x);
-        
+
         fprintf(log, "\tthis->y = %d;\n", this->y);
-        
+
         fprintf(log, "\tthis->width = %d;\n", this->width);
-        
+
         fprintf(log, "\tthis->height = %d;\n", this->height);
-        
+
         fprintf(log, "\tthis->points_qty = %lu;\n", this->points_qty);
-        
+
         fprintf(log, "\tthis->label[%p] = %s;\n", this->label, this->label);
-        
+
         fprintf(log, "\tthis->x_axis_text[%p] = %s;\n", this->x_axis_text, this->x_axis_text);
-        
+
         fprintf(log, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
         fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
-        
-        
+
         for (size_t i = 0; i < points_qty; ++i) {
             printf("\t\tpoints[%lu]: x = %d, y = %d\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
         }
 
         fprintf(log, "\n==========================================================/\n\n");
         fclose(log);
-        
     }
 
     const size_t points_qty;
-    Point<X_t, Y_t>* points;
+    Point* points;
 
     char* label;
 
     char* x_axis_text;
     char* y_axis_text;
 };
-
-
 
 // Имплементация кнопки
 typedef void (*Callback)();
@@ -461,8 +451,7 @@ void Resize(int widht, int height)
             buttons[i].x = window_width / 3 * i + 5;
         }
     }
-    
-    
+
     glViewport(0, 0, widht, height);
 }
 
