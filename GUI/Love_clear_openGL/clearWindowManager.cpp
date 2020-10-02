@@ -130,9 +130,9 @@ struct Point {
 
 // Имплементация графика
 
-struct Graph : public Drawable {
+struct GraphManager : public Drawable {
 
-    Graph(int x = 0
+    GraphManager(int x = 0
     , int y = 0
     , int width = 0
     , int height = 0
@@ -166,7 +166,7 @@ struct Graph : public Drawable {
         TellMeEverythingIWannaHear();
     }
 
-    Graph(const Graph& from)
+    GraphManager(const GraphManager& from)
         : Drawable(from)
         , points_qty(from.points_qty)
     {
@@ -179,7 +179,7 @@ struct Graph : public Drawable {
         memcpy(this->points, from.points, sizeof(Point) * from.points_qty);
     }
 
-    ~Graph()
+    ~GraphManager()
     {
         free(label);
         free(x_axis_text);
@@ -200,7 +200,7 @@ struct Graph : public Drawable {
             tmp_point = new (points + i) Point(x_values[i], y_values[i]);
 
         if (points_qty != 0 && points[points_qty-1].x == 0) {
-            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Set it to 1.", this))
+            ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s x_max = 0! Set it to 1.", this))
             points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
         }
 
@@ -210,7 +210,7 @@ struct Graph : public Drawable {
         }
 
         if (y_max == 0) {
-            ON_DEBUG(MSG_TO_LOG("Graph[%p]'s y_max = 0! Set it to 1.", this))
+            ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s y_max = 0! Set it to 1.", this))
             y_max = 1;
         }
     }
@@ -252,7 +252,7 @@ private:
         FILE* log = fopen(log_name, "at");
         fprintf(log, "\n\n==========================================================\\\n\n");
 
-        fprintf(log, "Meow there! I am graph [%p].\n", this);
+        fprintf(log, "Meow there! I am GraphManager [%p].\n", this);
 
         fprintf(log, "\tthis->x = %d;\n", this->x);
 
@@ -463,7 +463,7 @@ size_t Button::qty = 0;
 
 Button* buttons = nullptr;
 
-Graph* graphs = nullptr;
+GraphManager* graphs = nullptr;
 
 /*----------------------------------------------------------------------------------------
 *	Функция, отвечающая за отрисовку всех объектов на 2д-оверлей над 3д-полем.

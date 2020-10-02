@@ -5,17 +5,17 @@ Created button with id '2'!
 
 ==========================================================\
 
-Meow there! I am graph [0x56463adfed20].
+Meow there! I am GraphManager [0x55dfe8876d20].
 	this->x = 5;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
 	this->points_qty = 0;
-	this->label[0x56463adfede0] = arf;
-	this->x_axis_text[0x56463adfee00] = arfff;
-	this->y_axis_text[0x56463adfee20] = arffff;
+	this->label[0x55dfe8876de0] = arf;
+	this->x_axis_text[0x55dfe8876e00] = arfff;
+	this->y_axis_text[0x55dfe8876e20] = arffff;
 	this->y_max = 0.000000;
-	this->points[0x56463adfedc0] = 0;
+	this->points[0x55dfe8876dc0] = 0;
 
 ==========================================================/
 
@@ -23,20 +23,20 @@ Meow there! I am graph [0x56463adfed20].
 
 ==========================================================\
 
-Meow there! I am graph [0x56463adfed68].
+Meow there! I am GraphManager [0x55dfe8876d68].
 	this->x = 325;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
 	this->points_qty = 0;
-	this->label[0x56463adfee60] = 123;
-	this->x_axis_text[0x56463adfee80] = 12345;
-	this->y_axis_text[0x56463adfeea0] = 123456;
+	this->label[0x55dfe8876e60] = 123;
+	this->x_axis_text[0x55dfe8876e80] = 12345;
+	this->y_axis_text[0x55dfe8876ea0] = 123456;
 	this->y_max = 0.000000;
-	this->points[0x56463adfee40] = 0;
+	this->points[0x55dfe8876e40] = 0;
 
 ==========================================================/
 
-Deleted button [0x56463adfe9d0] with id '0' and label 'Bubble sort'!
-Deleted button [0x56463adfea08] with id '1' and label 'Insertion sort'!
-Deleted button [0x56463adfea40] with id '2' and label 'Quick sort'!
+Deleted button [0x55dfe88769d0] with id '0' and label 'Bubble sort'!
+Deleted button [0x55dfe8876a08] with id '1' and label 'Insertion sort'!
+Deleted button [0x55dfe8876a40] with id '2' and label 'Quick sort'!

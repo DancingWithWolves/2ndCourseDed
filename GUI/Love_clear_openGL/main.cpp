@@ -102,7 +102,7 @@ void Clear()
     ::operator delete(buttons);
 
     for (int i = 0; i < graphs_qty; ++i) {
-        graphs[i].~Graph();
+        graphs[i].~GraphManager();
     }
     ::operator delete(graphs);
 }
@@ -143,10 +143,10 @@ int main(int argc, char** argv)
 
 
 
-    graphs = reinterpret_cast<Graph*>(::operator new(sizeof(Graph) * graphs_qty));
+    graphs = reinterpret_cast<GraphManager*>(::operator new(sizeof(GraphManager) * graphs_qty));
 
-    Graph* graph = nullptr;
-    graph = new (graphs) Graph
+    GraphManager* graphManager = nullptr;
+    graphManager = new (graphs) GraphManager
         ( default_margin
         , button_height + default_margin * 4 
         , window_width / 2 - 2 * default_margin
@@ -156,10 +156,10 @@ int main(int argc, char** argv)
         , "arffff"
         );
 
-    graph = new (graphs + 1) Graph
+    graphManager = new (graphs + 1) GraphManager
         ( default_margin + graphs[0].width + 2 * default_margin
-        , graph[0].y
-        , graph[0].width
+        , graphs[0].y
+        , graphs[0].width
         , graph_height
         , "123"
         , "12345"
