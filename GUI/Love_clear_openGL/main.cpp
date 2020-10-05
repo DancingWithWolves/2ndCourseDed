@@ -166,7 +166,6 @@ int main(int argc, char** argv)
         , "123456"
         );
 
-    // drawable_list.push_front(&graph1);
     for (int i = 0; i < graphs_qty; ++i) {
         drawable_list.push_front(&graphs[i]);
     }

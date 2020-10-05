@@ -211,8 +211,7 @@ struct GraphManager : public Drawable {
         this->x_axis_text = strdup(from.x_axis_text);
         this->y_axis_text = strdup(from.y_axis_text);
 
-        this->graphs = reinterpret_cast<Graph*>(::operator new(sizeof(Graph) * from.graphs_qty));
-        memcpy(this->graphs, from.graphs, sizeof(Graph) * from.graphs_qty);
+        this->graphs = from.graphs;
     }
 
     ~GraphManager()
@@ -220,8 +219,6 @@ struct GraphManager : public Drawable {
         free(label);
         free(x_axis_text);
         free(y_axis_text);
-
-        ::operator delete(points);
     }
 
     
@@ -243,6 +240,11 @@ struct GraphManager : public Drawable {
                 
     }
 
+
+    void AddGraph()
+    {
+
+    }
 private:
     void TellMeEverythingIWannaHear()
     {
