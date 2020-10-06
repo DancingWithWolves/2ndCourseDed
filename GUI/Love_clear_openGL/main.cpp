@@ -169,6 +169,16 @@ int main(int argc, char** argv)
     for (int i = 0; i < graphs_qty; ++i) {
         drawable_list.push_front(&graphs[i]);
     }
+    const float x_val[] = {1, 2, 3, 4, 5};
+    const float y_val[] = {2, 3, 2, 1, 4};
+
+    graphs[0].AddGraph(5, x_val, y_val);
+
+    const float x_val1[] = {1, 2, 3, 4, 5};
+    const float y_val1[] = {4, 5, 1, 2, 4};
+
+    graphs[0].AddGraph(5, x_val1, y_val1);
+
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);

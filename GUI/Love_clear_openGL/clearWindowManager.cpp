@@ -13,10 +13,13 @@
 
 #include <GL/glut.h>
 
+
+FILE *LOG = nullptr;
+
 #define MSG_TO_LOG(format, args...)    \
-    FILE* log = fopen(log_name, "at"); \
-    fprintf(log, format, ##args);      \
-    fclose(log);
+    LOG = fopen(log_name, "at"); \
+    fprintf(LOG, format, ##args);      \
+    fclose(LOG);
 
 #ifdef DEBUG
 #define ON_DEBUG(param) param
@@ -28,7 +31,7 @@ extern const int buttons_qty;
 
 extern const int graphs_qty;
 
-const char log_name[] = "GUI.log";
+const char log_name[] = "GUI.LOG";
 
 struct Mouse {
     int x;
@@ -117,6 +120,31 @@ struct Point {
     float x;
     float y;
 
+    const bool operator > (const Point& point) 
+    { 
+        if (this->x > point.x)
+            return true;
+        if (this->x == point.x)
+            return this->y > point.y;
+        return false;  
+    }
+
+    const bool operator == (const Point& point) 
+    { 
+        if (this->x == point.x && this->y == point.y)
+            return true;
+        return false;
+    }
+    
+    const bool operator < (const Point& point) 
+    { 
+        if (this->x < point.x)
+            return true;
+        if (this->x == point.x)
+            return this->y < point.y;
+        return false;  
+    }
+
     Point() : x(0), y(0)
     {
     }
@@ -136,36 +164,60 @@ struct GraphManager : public Drawable {
         
         const size_t points_qty;
         Point* points;
-        float y_max;
+        float y_max, x_max;
 
-        void SetPoints(size_t points_qty, const float *x_values, const float *y_values)
+        explicit Graph (size_t points_qty, const float *x_values, const float *y_values, bool sorted = true)
+        : points_qty(points_qty)
         {
             assert(x_values);
             assert(y_values);
             assert(points_qty > 0);
+            ON_DEBUG(MSG_TO_LOG("Hello there! I am Graph[%p] being constructed\n", this))
+
+            x_max = x_values[0];
+            y_max = y_values[0];
+            
+            points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * points_qty));
 
             Point* tmp_point = nullptr;
-
+            
             for (size_t i = 0; i < points_qty; ++i)
                 tmp_point = new (points + i) Point(x_values[i], y_values[i]);
+            
+
+            if (!sorted)
+                std::sort(points, points + points_qty - 1);
 
             if (points_qty != 0 && points[points_qty-1].x == 0) {
-                ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s x_max = 0! Set it to 1.", this))
+                ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Set it to 1.", this))
                 points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
             }
 
-            for (int i = 0; i < points_qty; ++i) {
+            for (size_t i = 0; i < points_qty; ++i) {
                 if (points[i].y > y_max)
-                    y_max = points[i].y; 
+                    y_max = points[i].y;
+                if (points[i].x > x_max)
+                    x_max = points[i].x; 
             }
 
             if (y_max == 0) {
-                ON_DEBUG(MSG_TO_LOG("GraphManager[%p]'s y_max = 0! Set it to 1.", this))
+                ON_DEBUG(MSG_TO_LOG("Graph[%p]'s y_max = 0! Set it to 1.", this))
                 y_max = 1;
             }
+            if (x_max == 0) {
+                ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Set it to 1.", this))
+                x_max = 1;
+            }
+
+            ON_DEBUG(MSG_TO_LOG("Hello there! I am Graph[%p] constructed\n", this))
         }
 
-        void Draw(const int x, const int y, const int width, const int height)
+        ~Graph()
+        {
+            // ::operator delete (points);
+        }
+
+        void Draw (const int x, const int y, const int width, const int height)
         {
             const float dx = width / points[points_qty-1].x;
             const float dy = height / y_max;
@@ -181,6 +233,7 @@ struct GraphManager : public Drawable {
             glEnd();
         }
     };
+
 
     GraphManager(int x = 0
     , int y = 0
@@ -241,47 +294,55 @@ struct GraphManager : public Drawable {
     }
 
 
-    void AddGraph()
+    void AddGraph(const Graph &graph)
     {
-
+        graphs.push_front(graph);
     }
+
+    void AddGraph(size_t points_qty, const float *x_values, const float *y_values, bool sorted = true)
+    {
+        Graph graph(points_qty, x_values, y_values, sorted);
+        graphs.push_front(graph);
+    }
+
+
 private:
     void TellMeEverythingIWannaHear()
     {
 #ifndef DEBUG
         return nullptr;
 #endif
-        FILE* log = fopen(log_name, "at");
-        fprintf(log, "\n\n==========================================================\\\n\n");
+        LOG = fopen(log_name, "at");
+        fprintf(LOG, "\n\n==========================================================\\\n\n");
 
-        fprintf(log, "Meow there! I am GraphManager [%p].\n", this);
+        fprintf(LOG, "Meow there! I am GraphManager [%p].\n", this);
 
-        fprintf(log, "\tthis->x = %d;\n", this->x);
+        fprintf(LOG, "\tthis->x = %d;\n", this->x);
 
-        fprintf(log, "\tthis->y = %d;\n", this->y);
+        fprintf(LOG, "\tthis->y = %d;\n", this->y);
 
-        fprintf(log, "\tthis->width = %d;\n", this->width);
+        fprintf(LOG, "\tthis->width = %d;\n", this->width);
 
-        fprintf(log, "\tthis->height = %d;\n", this->height);
+        fprintf(LOG, "\tthis->height = %d;\n", this->height);
 
-        // fprintf(log, "\tthis->points_qty = %lu;\n", this->points_qty);
+        // fprintf(LOG, "\tthis->points_qty = %lu;\n", this->points_qty);
 
-        fprintf(log, "\tthis->label[%p] = %s;\n", this->label, this->label);
+        fprintf(LOG, "\tthis->label[%p] = %s;\n", this->label, this->label);
 
-        fprintf(log, "\tthis->x_axis_text[%p] = %s;\n", this->x_axis_text, this->x_axis_text);
+        fprintf(LOG, "\tthis->x_axis_text[%p] = %s;\n", this->x_axis_text, this->x_axis_text);
 
-        fprintf(log, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
+        fprintf(LOG, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
-        // fprintf(log, "\tthis->y_max = %lf;\n", this->y_max);
+        // fprintf(LOG, "\tthis->y_max = %lf;\n", this->y_max);
 
-        // fprintf(log, "\tthis->points[%p] = %d;\n", this->points);
+        // fprintf(LOG, "\tthis->points[%p] = %d;\n", this->points);
 
         // for (size_t i = 0; i < points_qty; ++i) {
-        //     fprintf(log, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
+        //     fprintf(LOG, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
         // }
 
-        fprintf(log, "\n==========================================================/\n\n");
-        fclose(log);
+        fprintf(LOG, "\n==========================================================/\n\n");
+        fclose(LOG);
     }
 
 
