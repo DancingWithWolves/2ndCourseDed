@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <assert.h>
 #include <forward_list>
 #include <stdarg.h>
@@ -14,11 +15,15 @@
 #include <GL/glut.h>
 
 
-FILE *LOG = nullptr;
+const char divider_str_in[] = "\n=================================================================\\\n";
+const char divider_str_out[] = "=================================================================/\n\n";
+FILE* LOG = nullptr;
 
-#define MSG_TO_LOG(format, args...)    \
-    LOG = fopen(log_name, "at"); \
-    fprintf(LOG, format, ##args);      \
+#define MSG_TO_LOG(format, args...) \
+    LOG = fopen(log_name, "at");    \
+    fprintf(LOG, "%s", divider_str_in);   \
+    fprintf(LOG, format, ##args);   \
+    fprintf(LOG, "%s", divider_str_out);   \
     fclose(LOG);
 
 #ifdef DEBUG
@@ -31,7 +36,7 @@ extern const int buttons_qty;
 
 extern const int graphs_qty;
 
-const char log_name[] = "GUI.LOG";
+const char log_name[] = "GUI.log";
 
 struct Mouse {
     int x;
@@ -120,32 +125,34 @@ struct Point {
     float x;
     float y;
 
-    const bool operator > (const Point& point) 
-    { 
+    const bool operator>(const Point& point)
+    {
         if (this->x > point.x)
             return true;
         if (this->x == point.x)
             return this->y > point.y;
-        return false;  
+        return false;
     }
 
-    const bool operator == (const Point& point) 
-    { 
+    const bool operator==(const Point& point)
+    {
         if (this->x == point.x && this->y == point.y)
             return true;
         return false;
     }
-    
-    const bool operator < (const Point& point) 
-    { 
+
+    const bool operator<(const Point& point)
+    {
         if (this->x < point.x)
             return true;
         if (this->x == point.x)
             return this->y < point.y;
-        return false;  
+        return false;
     }
 
-    Point() : x(0), y(0)
+    Point()
+        : x(0)
+        , y(0)
     {
     }
 
@@ -160,44 +167,62 @@ struct Point {
 
 struct GraphManager : public Drawable {
 
-    struct Graph {
-        
+    int range_x_low, range_x_up;
+    int range_y_low, range_y_up;
+
+    int graph_width, graph_height;
+    int graph_x, graph_y;
+
+    struct Graph : public Drawable {
+
+        GraphManager* daddy;
         const size_t points_qty;
         Point* points;
-        float y_max, x_max;
+        float y_max, y_min, x_max, x_min;
 
-        explicit Graph (size_t points_qty, const float *x_values, const float *y_values, bool sorted = true)
-        : points_qty(points_qty)
+        Graph(GraphManager* daddy, const size_t points_qty, const float* x_values, const float* y_values, bool sorted = false)
+            : points_qty(points_qty)
+            , daddy(daddy)
         {
+            assert(daddy);
             assert(x_values);
             assert(y_values);
             assert(points_qty > 0);
             ON_DEBUG(MSG_TO_LOG("Hello there! I am Graph[%p] being constructed\n", this))
 
+            x_min = x_values[0];
             x_max = x_values[0];
+
+            y_min = y_values[0];
             y_max = y_values[0];
-            
+
             points = reinterpret_cast<Point*>(::operator new(sizeof(Point) * points_qty));
 
             Point* tmp_point = nullptr;
-            
+
             for (size_t i = 0; i < points_qty; ++i)
                 tmp_point = new (points + i) Point(x_values[i], y_values[i]);
-            
 
             if (!sorted)
                 std::sort(points, points + points_qty - 1);
 
-            if (points_qty != 0 && points[points_qty-1].x == 0) {
+            if (points_qty != 0 && points[points_qty - 1].x == 0) {
                 ON_DEBUG(MSG_TO_LOG("Graph[%p]'s x_max = 0! Set it to 1.", this))
-                points[points_qty-1].x = 1; //Чтобы на 0 не поделить ненароком
+                points[points_qty - 1].x = 1; //Чтобы на 0 не поделить ненароком
             }
 
             for (size_t i = 0; i < points_qty; ++i) {
+                if (points[i].x < x_min)
+                    x_min = points[i].x;
+
+                if (points[i].x > x_max)
+                    x_max = points[i].x;
+
+                if (points[i].y < y_min)
+                    y_min = points[i].y;
+
                 if (points[i].y > y_max)
                     y_max = points[i].y;
-                if (points[i].x > x_max)
-                    x_max = points[i].x; 
             }
 
             if (y_max == 0) {
@@ -210,6 +235,18 @@ struct GraphManager : public Drawable {
             }
 
             ON_DEBUG(MSG_TO_LOG("Hello there! I am Graph[%p] constructed\n", this))
+
+            if (x_min < daddy->range_x_low
+                || x_max < daddy->range_x_up
+                || y_min < daddy->range_y_low
+                || y_max > daddy->range_y_up) {
+                daddy->ChangeRange(
+                    std::min(x_min
+                    , static_cast<float>(daddy->range_x_low))
+                    , std::max(x_max, static_cast<float>(daddy->range_x_up))
+                    , std::min(y_min, static_cast<float>(daddy->range_y_low))
+                    , std::max(y_max, static_cast<float>(daddy->range_y_up)));
+            }
         }
 
         ~Graph()
@@ -217,34 +254,37 @@ struct GraphManager : public Drawable {
             // ::operator delete (points);
         }
 
-        void Draw (const int x, const int y, const int width, const int height)
+        void Draw()
         {
-            const float dx = width / points[points_qty-1].x;
-            const float dy = height / y_max;
+            assert(daddy);
+            int range_x = daddy->range_x_up - daddy->range_x_low;
+            assert(range_x >= 0);
 
-            glColor3f(1,1,1);
+            int range_y = daddy->range_y_up - daddy->range_y_low;
+            assert(range_y >= 0);
+
+            const float dx = daddy->graph_width / range_x;
+            const float dy = daddy->graph_height / range_y;
+
+            glColor3f(1, 1, 1);
 
             glBegin(GL_LINE_STRIP);
 
             for (size_t i = 0; i < points_qty; ++i) {
-                glVertex2i(x + points[i].x * dx, y + height - points[i].y * dy);
+                glVertex2i(daddy->graph_x + (points[i].x - daddy->range_x_low) * dx, daddy->graph_y + daddy->graph_height - (points[i].y - daddy->range_y_low) * dy);
             }
 
             glEnd();
         }
     };
 
-
-    GraphManager(int x = 0
-    , int y = 0
-    , int width = 0
-    , int height = 0
-    , const char* label = default_label
-    , const char* x_axis_text = default_x_text
-    , const char* y_axis_text = default_y_text
-    )
+    GraphManager(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_x_text, const char* y_axis_text = default_y_text, int range_x_low = 0, int range_x_up = 0, int range_y_low = 0, int range_y_up = 0)
         : Drawable(x, y, width, height)
         , graphs_qty(0)
+        , range_x_low(range_x_low)
+        , range_x_up(range_x_up)
+        , range_y_low(range_y_low)
+        , range_y_up(range_y_up)
     {
 
         this->label = strdup(label);
@@ -258,6 +298,10 @@ struct GraphManager : public Drawable {
     GraphManager(const GraphManager& from)
         : Drawable(from)
         , graphs_qty(from.graphs_qty)
+        , graph_height(from.graph_height)
+        , graph_width(from.graph_width)
+        , graph_x(from.graph_x)
+        , graph_y(from.graph_y)
     {
         this->label = strdup(from.label);
 
@@ -274,8 +318,6 @@ struct GraphManager : public Drawable {
         free(y_axis_text);
     }
 
-    
-
     void Draw()
     {
         glColor3f(BUTTON_COLOR);
@@ -287,24 +329,41 @@ struct GraphManager : public Drawable {
         glVertex2i(this->x + this->width, this->y);
         glEnd();
 
-        for (auto &graph : graphs) {
-            graph.Draw(this->x, this->y, this->width, this->height);
+        for (auto& graph : graphs) {
+            graph.Draw();
         }
-                
     }
 
+    void ChangeRange(int new_x_low, int new_x_up, int new_y_low, int new_y_up)
+    {
+        SetRangeX(std::min(new_x_low, this->range_x_low), std::max(new_x_up, this->range_x_up));
+        SetRangeY(std::min(new_y_low, this->range_y_low), std::max(new_y_up, this->range_y_up));
+        ON_DEBUG(MSG_TO_LOG("GraphManager [%p]'s new range is:\n\tx_low %d\n\tx_up %d\n\ty_low %d\n\ty_up %d\n", this, this->range_x_low, this->range_x_up, this->range_y_low, this->range_y_up))
+        Draw();
+    }
 
-    void AddGraph(const Graph &graph)
+    void SetRangeX(int new_low, int new_up)
+    {
+        this->range_x_low = new_low;
+        this->range_x_up = new_up;
+    }
+
+    void SetRangeY(int new_low, int new_up)
+    {
+        this->range_y_low = new_low;
+        this->range_y_up = new_up;
+    }
+
+    void AddGraph(const Graph& graph)
     {
         graphs.push_front(graph);
     }
 
-    void AddGraph(size_t points_qty, const float *x_values, const float *y_values, bool sorted = true)
+    void AddGraph(size_t points_qty, const float* x_values, const float* y_values, bool sorted = true)
     {
-        Graph graph(points_qty, x_values, y_values, sorted);
+        Graph graph(this, points_qty, x_values, y_values, sorted);
         graphs.push_front(graph);
     }
-
 
 private:
     void TellMeEverythingIWannaHear()
@@ -313,7 +372,7 @@ private:
         return nullptr;
 #endif
         LOG = fopen(log_name, "at");
-        fprintf(LOG, "\n\n==========================================================\\\n\n");
+        fprintf(LOG, "%s\n", divider_str_in);
 
         fprintf(LOG, "Meow there! I am GraphManager [%p].\n", this);
 
@@ -325,15 +384,16 @@ private:
 
         fprintf(LOG, "\tthis->height = %d;\n", this->height);
 
-        // fprintf(LOG, "\tthis->points_qty = %lu;\n", this->points_qty);
-
         fprintf(LOG, "\tthis->label[%p] = %s;\n", this->label, this->label);
 
         fprintf(LOG, "\tthis->x_axis_text[%p] = %s;\n", this->x_axis_text, this->x_axis_text);
 
         fprintf(LOG, "\tthis->y_axis_text[%p] = %s;\n", this->y_axis_text, this->y_axis_text);
 
-        // fprintf(LOG, "\tthis->y_max = %lf;\n", this->y_max);
+        fprintf(LOG, "\tthis->range_x_low = %lf;\n", this->range_x_low);
+        fprintf(LOG, "\tthis->range_x_up = %lf;\n", this->range_x_up);
+        fprintf(LOG, "\tthis->range_y_low = %lf;\n", this->range_y_low);
+        fprintf(LOG, "\tthis->range_y_up = %lf;\n", this->range_y_up);
 
         // fprintf(LOG, "\tthis->points[%p] = %d;\n", this->points);
 
@@ -341,10 +401,9 @@ private:
         //     fprintf(LOG, "\t\tpoints[%lu]: x = %lf, y = %lf\n", i, points[i].x, points[i].y); //TODO: написать темплейтовую версию
         // }
 
-        fprintf(LOG, "\n==========================================================/\n\n");
+        fprintf(LOG, "\n%s\n\n", divider_str_out);
         fclose(LOG);
     }
-
 
     char* label;
 
@@ -576,15 +635,13 @@ void Resize(int widht, int height)
 
     int new_graphs_width = std::min(window_width / 2 - 2 * default_margin, window_height - button_height - 5 * default_margin);
 
-    for ( int i = 0; i < graphs_qty; ++i ) {
+    for (int i = 0; i < graphs_qty; ++i) {
         graphs[i].width = new_graphs_width;
         graphs[i].height = new_graphs_width;
     }
     graphs[0].x = window_width / 2 - default_margin - new_graphs_width;
     graphs[1].x = window_width / 2 + default_margin;
 
-
-    
     glViewport(0, 0, widht, height);
 }
 

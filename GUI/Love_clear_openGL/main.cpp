@@ -154,6 +154,10 @@ int main(int argc, char** argv)
         , "arf"
         , "arfff"
         , "arffff"
+        , -5
+        , 5
+        , -5
+        , 5
         );
 
     graphManager = new (graphs + 1) GraphManager
@@ -164,6 +168,10 @@ int main(int argc, char** argv)
         , "123"
         , "12345"
         , "123456"
+        , 0
+        , 0
+        , 0
+        , 0
         );
 
     for (int i = 0; i < graphs_qty; ++i) {
@@ -172,12 +180,12 @@ int main(int argc, char** argv)
     const float x_val[] = {1, 2, 3, 4, 5};
     const float y_val[] = {2, 3, 2, 1, 4};
 
+
+    const float x_val1[] = {2, 3, 4, 1, 5};
+    const float y_val1[] = {15, 11, 12, 14, 14};
+
+    graphs[0].AddGraph(5, x_val1, y_val1, false);
     graphs[0].AddGraph(5, x_val, y_val);
-
-    const float x_val1[] = {1, 2, 3, 4, 5};
-    const float y_val1[] = {4, 5, 1, 2, 4};
-
-    graphs[0].AddGraph(5, x_val1, y_val1);
 
 
     glutInit(&argc, argv);
