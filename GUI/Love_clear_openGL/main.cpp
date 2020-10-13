@@ -102,9 +102,9 @@ void Clear()
     ::operator delete(buttons);
 
     for (int i = 0; i < graphs_qty; ++i) {
-        graphs[i].~GraphManager();
+        graph_managers[i].~GraphManager();
     }
-    ::operator delete(graphs);
+    ::operator delete(graph_managers);
 }
 
 int main(int argc, char** argv)
@@ -143,16 +143,16 @@ int main(int argc, char** argv)
 
 
 
-    graphs = reinterpret_cast<GraphManager*>(::operator new(sizeof(GraphManager) * graphs_qty));
+    graph_managers = reinterpret_cast<GraphManager*>(::operator new(sizeof(GraphManager) * graphs_qty));
 
     GraphManager* graphManager = nullptr;
-    graphManager = new (graphs) GraphManager
+    graphManager = new (graph_managers) GraphManager
         ( default_margin
         , button_height + default_margin * 4 
         , window_width / 2 - 2 * default_margin
         , graph_height
-        , default_margin
-        , default_margin
+        , 5*default_margin
+        , 5*default_margin
         , "arf"
         , "arfff"
         , "arffff"
@@ -162,13 +162,13 @@ int main(int argc, char** argv)
         , 5
         );
 
-    graphManager = new (graphs + 1) GraphManager
-        ( default_margin + graphs[0].width + 2 * default_margin
-        , graphs[0].y
-        , graphs[0].width
+    graphManager = new (graph_managers + 1) GraphManager
+        ( default_margin + graph_managers[0].width + 2 * default_margin
+        , graph_managers[0].y
+        , graph_managers[0].width
         , graph_height
-        , default_margin
-        , default_margin
+        , 5*default_margin
+        , 5*default_margin
         , "123"
         , "12345"
         , "123456"
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
         );
 
     for (int i = 0; i < graphs_qty; ++i) {
-        drawable_list.push_front(&graphs[i]);
+        drawable_list.push_front(&graph_managers[i]);
     }
     const float x_val[] = {1, 2, 3, 4, 5};
     const float y_val[] = {2, 3, 2, 1, 4};
@@ -188,8 +188,8 @@ int main(int argc, char** argv)
     const float x_val1[] = {2, 3, 4, 1, 5};
     const float y_val1[] = {15, 11, 12, 14, 14};
 
-    graphs[0].AddGraph(5, x_val1, y_val1, false);
-    graphs[0].AddGraph(5, x_val, y_val);
+    graph_managers[0].AddGraph(5, x_val1, y_val1, false);
+    graph_managers[0].AddGraph(5, x_val, y_val);
 
 
     glutInit(&argc, argv);

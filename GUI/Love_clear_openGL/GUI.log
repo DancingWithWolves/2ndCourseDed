@@ -16,14 +16,14 @@ Created button with id '2'!
 
 =================================================================\
 
-Meow there! I am GraphManager [0x55e6d1926d20].
+Meow there! I am GraphManager [0x55572e6ebd20].
 	this->x = 5;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
-	this->label[0x55e6d1926df0] = arf;
-	this->x_axis_text[0x55e6d1926e10] = arfff;
-	this->y_axis_text[0x55e6d1926e30] = arffff;
+	this->label[0x55572e6ebe00] = arf;
+	this->x_axis_text[0x55572e6ebe20] = arfff;
+	this->y_axis_text[0x55572e6ebe40] = arffff;
 	this->range_x_low = 0.000000;
 	this->range_x_up = 0.000000;
 	this->range_y_low = 0.000000;
@@ -36,14 +36,14 @@ Meow there! I am GraphManager [0x55e6d1926d20].
 
 =================================================================\
 
-Meow there! I am GraphManager [0x55e6d1926d80].
+Meow there! I am GraphManager [0x55572e6ebd88].
 	this->x = 325;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
-	this->label[0x55e6d1926e50] = 123;
-	this->x_axis_text[0x55e6d1926e70] = 12345;
-	this->y_axis_text[0x55e6d1926e90] = 123456;
+	this->label[0x55572e6ebe60] = 123;
+	this->x_axis_text[0x55572e6ebe80] = 12345;
+	this->y_axis_text[0x55572e6ebea0] = 123456;
 	this->range_x_low = 0.000000;
 	this->range_x_up = 0.000000;
 	this->range_y_low = 0.000000;
@@ -55,12 +55,12 @@ Meow there! I am GraphManager [0x55e6d1926d80].
 
 
 =================================================================\
-Hello there! I am Graph[0x7ffe754ff210] being constructed
+Hello there! I am Graph[0x7ffe82ef34a0] being constructed
 =================================================================/
 
 
 =================================================================\
-GraphManager [0x55e6d1926d20]'s new range is:
+GraphManager [0x55572e6ebd20]'s new range is:
 	x_low -5
 	x_up 5
 	y_low -5
@@ -69,71 +69,31 @@ GraphManager [0x55e6d1926d20]'s new range is:
 
 
 =================================================================\
-Meow there! I am Graph[0x7ffe754ff210] constructed
+Meow there! I am Graph[0x7ffe82ef34a0] constructed
 =================================================================/
 
 
 =================================================================\
-Hello there! I am Graph[0x7ffe754ff210] being constructed
+Hello there! I am Graph[0x7ffe82ef34a0] being constructed
 =================================================================/
 
 
 =================================================================\
-Meow there! I am Graph[0x7ffe754ff210] constructed
+Meow there! I am Graph[0x7ffe82ef34a0] constructed
 =================================================================/
 
 
 =================================================================\
-I am graph[0x55e6d1926f58] being drawed!
+Deleted button [0x55572e6eb9d0] with id '0' and label 'Bubble sort'!
 =================================================================/
 
 
 =================================================================\
-I am graph[0x55e6d19142a8] being drawed!
+Deleted button [0x55572e6eba08] with id '1' and label 'Insertion sort'!
 =================================================================/
 
 
 =================================================================\
-I am graph[0x55e6d1926f58] being drawed!
-=================================================================/
-
-
-=================================================================\
-I am graph[0x55e6d19142a8] being drawed!
-=================================================================/
-
-
-=================================================================\
-I am graph[0x55e6d1926f58] being drawed!
-=================================================================/
-
-
-=================================================================\
-I am graph[0x55e6d19142a8] being drawed!
-=================================================================/
-
-
-=================================================================\
-I am graph[0x55e6d1926f58] being drawed!
-=================================================================/
-
-
-=================================================================\
-I am graph[0x55e6d19142a8] being drawed!
-=================================================================/
-
-
-=================================================================\
-Deleted button [0x55e6d19269d0] with id '0' and label 'Bubble sort'!
-=================================================================/
-
-
-=================================================================\
-Deleted button [0x55e6d1926a08] with id '1' and label 'Insertion sort'!
-=================================================================/
-
-
-=================================================================\
-Deleted button [0x55e6d1926a40] with id '2' and label 'Quick sort'!
+Deleted button [0x55572e6eba40] with id '2' and label 'Quick sort'!
 =================================================================/
 

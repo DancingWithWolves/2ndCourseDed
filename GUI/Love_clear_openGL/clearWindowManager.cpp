@@ -113,6 +113,7 @@ struct Drawable {
     }
 
     void virtual Draw() = 0;
+    void virtual Resize(int new_window_width, int new_window_height) = 0;
 
     int x, y, width, height;
 };
@@ -171,9 +172,9 @@ struct GraphManager : public Drawable {
     int range_y_low, range_y_up;
 
     int graph_width, graph_height;
-    int graph_x, graph_y;
+    int graph_x, margin_to_graph_x, graph_y, margin_to_graph_y;
 
-    struct Graph : public Drawable {
+    struct Graph {
 
         GraphManager* daddy;
         const size_t points_qty;
@@ -258,7 +259,6 @@ struct GraphManager : public Drawable {
         void Draw()
         {
             assert(daddy);
-            ON_DEBUG(MSG_TO_LOG("I am graph[%p] being drawed!\n", this))
             int range_x = daddy->range_x_up - daddy->range_x_low;
             assert(range_x > 0);
 
@@ -268,7 +268,6 @@ struct GraphManager : public Drawable {
             const float dx = daddy->graph_width / range_x;
             const float dy = daddy->graph_height / range_y;
 
-            glColor3f(1, 1, 1);
 
             glBegin(GL_LINE_STRIP);
 
@@ -295,6 +294,8 @@ struct GraphManager : public Drawable {
                 , int range_y_low = 0
                 , int range_y_up = 0)
         : Drawable(x, y, width, height)
+        , margin_to_graph_x (margin_to_graph_x)
+        , margin_to_graph_y (margin_to_graph_y)
         , graph_x (x + margin_to_graph_x)
         , graph_y (y + margin_to_graph_y)
         , graphs_qty(0)
@@ -347,9 +348,23 @@ struct GraphManager : public Drawable {
         glVertex2i(this->x + this->width, this->y);
         glEnd();
 
+        glColor3f(BUTTON_HIGHLITED_COLOR);
+        glBegin(GL_QUADS);
+        glVertex2i(this->graph_x, this->graph_y);
+        glVertex2i(this->graph_x, this->graph_y + this->graph_height);
+        glVertex2i(this->graph_x + this->graph_width, this->graph_y + this->graph_height);
+        glVertex2i(this->graph_x + this->graph_width, this->graph_y);
+        glEnd();
+
+        glColor3f(1, 1, 1);
         for (auto& graph : graphs) {
             graph.Draw();
         }
+    }
+
+    void Resize(int new_width, int new_height)
+    {
+
     }
 
     void ChangeRange(int new_x_low, int new_x_up, int new_y_low, int new_y_up)
@@ -592,6 +607,10 @@ struct Button : public Clickable {
         ::Font(GLUT_BITMAP_HELVETICA_10, this->label, fontx, fonty);
     }
 
+    void Resize(int new_width, int new_height)
+    {
+
+    }
 private:
     static size_t qty;
     size_t id;
@@ -602,7 +621,7 @@ size_t Button::qty = 0;
 
 Button* buttons = nullptr;
 
-GraphManager* graphs = nullptr;
+GraphManager* graph_managers = nullptr;
 
 /*----------------------------------------------------------------------------------------
 *	Функция, отвечающая за отрисовку всех объектов на 2д-оверлей над 3д-полем.
@@ -651,14 +670,23 @@ void Resize(int widht, int height)
         }
     }
 
-    int new_graphs_width = std::min(window_width / 2 - 2 * default_margin, window_height - button_height - 5 * default_margin);
+    int new_graph_managers_width = std::min(window_width / 2 - 2 * default_margin, window_height - button_height - 5 * default_margin);
+
+    graph_managers[0].x = window_width / 2 - default_margin - new_graph_managers_width;
+    graph_managers[1].x = window_width / 2 + default_margin;
 
     for (int i = 0; i < graphs_qty; ++i) {
-        graphs[i].width = new_graphs_width;
-        graphs[i].height = new_graphs_width;
+        graph_managers[i].width = new_graph_managers_width;
+        graph_managers[i].height = new_graph_managers_width;
+
+        graph_managers[i].graph_x = graph_managers[i].x + graph_managers[i].margin_to_graph_x;
+        graph_managers[i].graph_y = graph_managers[i].y + graph_managers[i].margin_to_graph_y;
+
+        graph_managers[i].graph_width = new_graph_managers_width - 2 * graph_managers[i].margin_to_graph_x;
+        graph_managers[i].graph_height = new_graph_managers_width - 2 * graph_managers[i].margin_to_graph_y;
     }
-    graphs[0].x = window_width / 2 - default_margin - new_graphs_width;
-    graphs[1].x = window_width / 2 + default_margin;
+    
+    
 
     glViewport(0, 0, widht, height);
 }
