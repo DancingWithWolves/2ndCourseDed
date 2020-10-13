@@ -151,6 +151,8 @@ int main(int argc, char** argv)
         , button_height + default_margin * 4 
         , window_width / 2 - 2 * default_margin
         , graph_height
+        , default_margin
+        , default_margin
         , "arf"
         , "arfff"
         , "arffff"
@@ -165,6 +167,8 @@ int main(int argc, char** argv)
         , graphs[0].y
         , graphs[0].width
         , graph_height
+        , default_margin
+        , default_margin
         , "123"
         , "12345"
         , "123456"

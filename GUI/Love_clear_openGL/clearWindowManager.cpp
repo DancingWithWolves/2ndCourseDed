@@ -234,7 +234,6 @@ struct GraphManager : public Drawable {
                 x_max = 1;
             }
 
-            ON_DEBUG(MSG_TO_LOG("Hello there! I am Graph[%p] constructed\n", this))
 
             if (x_min < daddy->range_x_low
                 || x_max < daddy->range_x_up
@@ -247,6 +246,8 @@ struct GraphManager : public Drawable {
                     , std::min(y_min, static_cast<float>(daddy->range_y_low))
                     , std::max(y_max, static_cast<float>(daddy->range_y_up)));
             }
+
+            ON_DEBUG(MSG_TO_LOG("Meow there! I am Graph[%p] constructed\n", this))
         }
 
         ~Graph()
@@ -257,11 +258,12 @@ struct GraphManager : public Drawable {
         void Draw()
         {
             assert(daddy);
+            ON_DEBUG(MSG_TO_LOG("I am graph[%p] being drawed!\n", this))
             int range_x = daddy->range_x_up - daddy->range_x_low;
-            assert(range_x >= 0);
+            assert(range_x > 0);
 
             int range_y = daddy->range_y_up - daddy->range_y_low;
-            assert(range_y >= 0);
+            assert(range_y > 0);
 
             const float dx = daddy->graph_width / range_x;
             const float dy = daddy->graph_height / range_y;
@@ -274,19 +276,35 @@ struct GraphManager : public Drawable {
                 glVertex2i(daddy->graph_x + (points[i].x - daddy->range_x_low) * dx, daddy->graph_y + daddy->graph_height - (points[i].y - daddy->range_y_low) * dy);
             }
 
+
             glEnd();
         }
     };
 
-    GraphManager(int x = 0, int y = 0, int width = 0, int height = 0, const char* label = default_label, const char* x_axis_text = default_x_text, const char* y_axis_text = default_y_text, int range_x_low = 0, int range_x_up = 0, int range_y_low = 0, int range_y_up = 0)
+    GraphManager( int x = 0
+                , int y = 0
+                , int width = 0
+                , int height = 0
+                , int margin_to_graph_x = 0
+                , int margin_to_graph_y = 0
+                , const char* label = default_label
+                , const char* x_axis_text = default_x_text
+                , const char* y_axis_text = default_y_text
+                , int range_x_low = 0
+                , int range_x_up = 0
+                , int range_y_low = 0
+                , int range_y_up = 0)
         : Drawable(x, y, width, height)
+        , graph_x (x + margin_to_graph_x)
+        , graph_y (y + margin_to_graph_y)
         , graphs_qty(0)
         , range_x_low(range_x_low)
         , range_x_up(range_x_up)
         , range_y_low(range_y_low)
         , range_y_up(range_y_up)
     {
-
+        this->graph_width = this->width - 2 * margin_to_graph_x;
+        this->graph_height = this->height - 2 * margin_to_graph_y;
         this->label = strdup(label);
 
         this->x_axis_text = strdup(x_axis_text);
