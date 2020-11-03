@@ -1,6 +1,6 @@
 #include <GL/glut.h>
 #include <assert.h>
-#include "../SoftAssert.hpp"
+#include "../Debug.hpp"
 
 extern int window_height;
 extern int window_width;
@@ -8,10 +8,8 @@ extern int window_width;
 
 void DrawRectangle(int x, int y, int width, int height)
 {
-    soft_assert(x + width < window_width);
-    soft_assert(y + height < window_height);
-
-    glColor3f(0.4f, 0.4f, 0.4f);
+    soft_assert(x + width <= window_width);
+    soft_assert(y + height <= window_height);
     
     glBegin(GL_QUADS);
         glVertex2i(x, y);

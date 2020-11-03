@@ -1,24 +1,8 @@
 #include <GL/glut.h>
 #include <cstdio>
 #include <cstdlib>
-#include "../SoftAssert.hpp"
+#include "../Debug.hpp"
 
-FILE* LOG = nullptr;
-
-#define MSG_TO_LOG(format, args...) \
-    LOG = fopen(log_name, "at");    \
-    fprintf(LOG, "%s", divider_str_in);   \
-    fprintf(LOG, format, ##args);   \
-    fprintf(LOG, "%s", divider_str_out);   \
-    fclose(LOG);
-
-#ifdef DEBUG
-#define ON_DEBUG(param) param
-#else
-#define ON_DEBUG(param) ;
-#endif
-
-const char log_name[] = "EventManager.log";
 
 struct Mouse {
     int x;
@@ -93,7 +77,7 @@ extern void ButtonPassiveMotionKeyPressed(int x, int y);
         glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
         glutInitWindowSize(window_width, window_height);
         glutInitWindowPosition(200, 100);
-        glutCreateWindow("Sorts");
+        glutCreateWindow("Windows Manager");
         glutDisplayFunc(EngineDraw);
         glutReshapeFunc(Resize);
         glutMouseFunc(MouseButton);
@@ -110,6 +94,12 @@ extern void ButtonPassiveMotionKeyPressed(int x, int y);
 
 void Resize(int width, int height)
 {
+    if (height == 0)
+        height = 1; //Чтобы на 0 не поделить ненароком
+
+    window_width = width;
+    window_height = height;
+
     ResizeCallback(width, height);
     glViewport(0, 0, width, height);
 }

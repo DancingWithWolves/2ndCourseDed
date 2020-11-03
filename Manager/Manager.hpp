@@ -2,25 +2,61 @@
 
 #include <iostream>
 #include <vector>
-#include "Manager.hpp"
 
 
 #include "Engine/GraphManager.hpp"
 #include "Engine/EventManager.hpp"
 
+extern const char log_name[];
+
 using std::vector;
 
 class Window {
     // Events handling
+public:
+    Window() 
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+    virtual ~Window() 
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
 };
 
 
 class ContainterWindow : public Window {
-    vector<Window> children;
+protected:
+    vector<Window*> children;
+public:
+    ContainterWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
+    ~ContainterWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
+    virtual void AddChild(Window *child)
+    {
+        children.push_back(child);
+    }
 };
 
 class DrawableWindow : public Window {
 public:
+    DrawableWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
+    ~DrawableWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
     virtual void Draw() = 0;
 };
 
@@ -29,6 +65,17 @@ vector<DrawableWindow*> drawable_windows;
 class ClickableWindow : public Window {
     
 public:
+
+    ClickableWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
+    ~ClickableWindow()
+    {
+        MSG_TO_LOG("Meow there from file <%s>, function <%s>, line %d!\n", meow)
+    }
+
     bool virtual CheckMouseOver(int mouse_x, int mouse_y) = 0;
     void virtual Passive(int mouse_x, int mouse_y) = 0;
     void virtual OnPress(int mouse_x, int mouse_y) = 0;
@@ -66,7 +113,6 @@ vector<ClickableWindow*> clickable_windows;
 //------------------------------------------------------------------/
     void Draw()
     {
-        printf("drawable_windows.size = %d\n", drawable_windows.size());
         for (auto &i : drawable_windows) {
             i->Draw();
         }
