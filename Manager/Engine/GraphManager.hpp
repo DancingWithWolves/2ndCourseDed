@@ -11,6 +11,8 @@ void DrawRectangle(int x, int y, int width, int height)
     soft_assert(x + width < window_width);
     soft_assert(y + height < window_height);
 
+    glColor3f(0.4f, 0.4f, 0.4f);
+    
     glBegin(GL_QUADS);
         glVertex2i(x, y);
         glVertex2i(x, y + height);

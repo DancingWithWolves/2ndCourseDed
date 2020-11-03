@@ -51,7 +51,8 @@ void MousePassiveMotion(int x, int y);
 
 
 //------------------------------------------------------------------\
-//                       Интерфейс с движком
+//                       Интерфейс с движком                        |
+//------------------------------------------------------------------/
 extern void Draw();
 
 extern void ResizeCallback(int widht, int height);
@@ -67,26 +68,41 @@ extern void RightMouseButtonReleased(int x, int y);
 extern void ButtonPassiveMotionNoKey(int x, int y);
 extern void ButtonPassiveMotionKeyPressed(int x, int y);
 
-//------------------------------------------------------------------\
-//                       Старт движка                               |
-//------------------------------------------------------------------/
+    //------------------------------------------------------------------\
+    //                       Старт движка                               |
+    //------------------------------------------------------------------/
 
-void StartEngine(int& argc, char* argv[])
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-    glutInitWindowSize(window_width, window_height);
-    glutInitWindowPosition(200, 100);
-    glutCreateWindow("Sorts");
+    void EngineDraw()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glutDisplayFunc(Draw);
-    glutReshapeFunc(Resize);
-    glutMouseFunc(MouseButton);
-    glutMotionFunc(MouseMotion);
-    glutPassiveMotionFunc(MousePassiveMotion);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, window_width, window_height, 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
+        
+        Draw();
 
-    glutMainLoop();
-}
+        glLoadIdentity();
+        glutSwapBuffers();
+    }
+
+    void StartEngine(int& argc, char* argv[])
+    {
+        glutInit(&argc, argv);
+        glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+        glutInitWindowSize(window_width, window_height);
+        glutInitWindowPosition(200, 100);
+        glutCreateWindow("Sorts");
+        glutDisplayFunc(EngineDraw);
+        glutReshapeFunc(Resize);
+        glutMouseFunc(MouseButton);
+        glutMotionFunc(MouseMotion);
+        glutPassiveMotionFunc(MousePassiveMotion);
+
+        glutMainLoop();
+    }
+    //------------------------------------------------------------------/
 
 //------------------------------------------------------------------/
 
