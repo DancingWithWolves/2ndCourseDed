@@ -68,23 +68,15 @@ extern void ButtonPassiveMotionKeyPressed(int x, int y);
         Draw();
 
         glLoadIdentity();
-        glutSwapBuffers();
     }
 
     void StartEngine(int& argc, char* argv[])
     {
-        glutInit(&argc, argv);
-        glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-        glutInitWindowSize(window_width, window_height);
-        glutInitWindowPosition(200, 100);
-        glutCreateWindow("Windows Manager");
-        glutDisplayFunc(EngineDraw);
-        glutReshapeFunc(Resize);
-        glutMouseFunc(MouseButton);
-        glutMotionFunc(MouseMotion);
-        glutPassiveMotionFunc(MousePassiveMotion);
+        sf::RenderWindow window(sf::VideoMode(150, 100), "SFML Works!");
 
-        glutMainLoop();
+        while (window.isOpen()) {
+            
+        }
     }
     //------------------------------------------------------------------/
 
@@ -99,9 +91,9 @@ void Resize(int width, int height)
 
     window_width = width;
     window_height = height;
-
-    ResizeCallback(width, height);
+    
     glViewport(0, 0, width, height);
+    ResizeCallback(width, height);
 }
 
 void Font(void* font, char* text, int x, int y)

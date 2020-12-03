@@ -7,8 +7,6 @@
 #include "Engine/GraphManager.hpp"
 #include "Engine/EventManager.hpp"
 
-extern const char log_name[];
-
 using std::vector;
 
 class Window {

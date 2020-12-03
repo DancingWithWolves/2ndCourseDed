@@ -3,7 +3,8 @@
 #include <assert.h>
 
 const char log_name[] = "WindowManager.log";
-
+const char divider_str_in[] = "\n==========================================================================================\\\n";
+const char divider_str_out[] = "==========================================================================================/\n";
 #define DEBUG
 
 FILE* LOG = nullptr;

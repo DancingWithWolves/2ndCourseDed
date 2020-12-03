@@ -1,0 +1,1 @@
+#define DEFAULT_COLOR 0.8f, 0.8f, 0.8f
