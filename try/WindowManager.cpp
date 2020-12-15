@@ -1,7 +1,7 @@
 #include "WindowManager.hpp"
-#include "GraphSystem.hpp"
 
 //============================================================================\
+
 
 Window::Window(Window* parent)
     : sweet_daddy(parent)
@@ -9,19 +9,19 @@ Window::Window(Window* parent)
     if (sweet_daddy) {
         sweet_daddy->AddChild(this);
     }
-    windows.insert(this);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 
 Window::~Window()
 {
     for (auto& child : children) {
-        child->~Window();
+        // child->sweet_daddy = nullptr;
     }
+    children.clear();
+
     if (sweet_daddy) {
         sweet_daddy->EraseChild(this);
     }
-    windows.erase(this);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 
@@ -38,41 +38,39 @@ void Window::EraseChild(Window* child)
 
 //============================================================================\
 
-DrawableWindow::DrawableWindow(Window* parent)
+DrawableWindow::DrawableWindow(Window* parent, Color color)
     : Window(parent)
+    , color(color)
 {
-    drawable_windows.insert(this);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 
-DrawableWindow::~DrawableWindow()
+DrawableWindow::~DrawableWindow() 
 {
-
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 //============================================================================/
 
-class RectangleWindow : DrawableWindow {
-    float x, y, width, height;
+RectangleWindow::RectangleWindow(Window* parent, Color color, float x, float y, float width, float height)
+    : DrawableWindow(parent, color)
+    , x(x)
+    , y(y)
+    , width(width)
+    , height(height)
+{
+    FULL_TRACE(MSG_TO_LOG(meow))
+}
 
-public:
-    RectangleWindow(Window* parent)
-        : DrawableWindow(parent)
-    {
-        FULL_TRACE(MSG_TO_LOG(meow))
-    }
-
-    ~RectangleWindow()
-    {
-        FULL_TRACE(MSG_TO_LOG(meow))
-    }
-
-    void Draw()
-    {
-        glColor3f(DEFAULT_COLOR);
-        DrawRectangle(x, y, width, height);
-    }
-};
+RectangleWindow::~RectangleWindow()
+{
+    printf("Suddenly I'm dead x(. My width was %f\n", width);
+    FULL_TRACE(MSG_TO_LOG(meow))
+}
+void RectangleWindow::Draw()
+{
+    printf("draw with width %f and color %f %f %f\n", width, color.r, color.g, color.b);
+    DrawRectangle(x, y, width, height, color);
+}
 
 //============================================================================\
 
@@ -80,8 +78,10 @@ ClickableWindow::ClickableWindow(Window* parent, Callback callback)
     : Window(parent)
     , callback(callback)
 {
-    clickable_windows.insert(this);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
-
+ClickableWindow::~ClickableWindow()
+{
+    FULL_TRACE(MSG_TO_LOG(meow))
+}
 //============================================================================/

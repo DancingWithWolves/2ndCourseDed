@@ -2,13 +2,11 @@
 #ifndef WINDOW_MANAGER
 #define WINDOW_MANAGER
 
-#include <unordered_set>
-
+#include "Debug.hpp"
+#include "Engine/GraphSystem.hpp"
 #include <iostream>
 
-#include "Debug.hpp"
-
-
+#include <unordered_set>
 using std::unordered_set;
 
 //============================================================================\
@@ -17,20 +15,17 @@ class Window {
 private:
     Window* sweet_daddy;
 
-protected:
-    unordered_set<Window*> children;
-
 public:
-    Window() = delete;
     Window(Window* parent);
     virtual ~Window();
 
+    unordered_set<Window*> children;
+
+    bool HasChildren() { return !children.empty(); }
     virtual void AddChild(Window* child);
 
     virtual void EraseChild(Window* child);
 };
-
-unordered_set<Window*> windows;
 
 //============================================================================/
 
@@ -38,16 +33,29 @@ unordered_set<Window*> windows;
 
 class DrawableWindow : public Window {
 public:
-    DrawableWindow() = delete;
-    DrawableWindow(Window* parent);
-    virtual ~DrawableWindow() = default;
+    Color color;
+    DrawableWindow(Window* parent, Color color);
+    virtual ~DrawableWindow();
 
     virtual void Draw() = 0;
 };
 
+//============================================================================/
 
-unordered_set<DrawableWindow*> drawable_windows;
+//============================================================================\
 
+class RectangleWindow : public DrawableWindow {
+    float x, y, width, height;
+
+public:
+    RectangleWindow(Window* parent, Color color, float x, float y, float width, float height);
+    virtual ~RectangleWindow();
+    void Draw();
+    float GetX() { return x; };
+    float GetY() { return y; }
+    void SetX(float x) { this->x = x; };
+    void SetY(float y) { this->y = y; };
+};
 //============================================================================/
 
 //============================================================================\
@@ -70,8 +78,6 @@ public:
     bool pressed, highlighted, active;
 };
 
-
-unordered_set<ClickableWindow*> clickable_windows;
 //============================================================================/
 
 #endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DEBUG_HPP
+#define DEBUG_HPP
 #include <cstdio>
 #include <assert.h>
 
@@ -7,10 +8,9 @@ const char divider_str_in[] = "\n===============================================
 const char divider_str_out[] = "==========================================================================================/\n";
 #define DEBUG
 
-FILE* LOG = nullptr;
 
 #define MSG_TO_LOG(format, args...) \
-    LOG = fopen(log_name, "at");    \
+    FILE *LOG = fopen(log_name, "at");    \
     fprintf(LOG, "%s", divider_str_in);   \
     fprintf(LOG, format, ##args);   \
     fprintf(LOG, "%s", divider_str_out);   \
@@ -40,3 +40,4 @@ if(!(cond)) MSG_TO_LOG("Assert %s failed! File %s, function %s, line %d!\n", #co
 #define ON_DEBUG(param) ;
 #endif
 
+#endif

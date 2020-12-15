@@ -1,16 +1,20 @@
-#include <GL/gl.h>
+#ifndef GRAPHSYSTEM
+#define GRAPHSYSTEM
+
+struct Color {
+    float r, g, b;
+    Color(float r, float g, float b) : r(r), g(g), b(b) {}
+};
+
+#include "EventSystem.hpp"
+#include <SFML/Graphics.hpp>
 #include "../LayoutConstants.hpp"
+
 
 //============================================================================\
 
-void DrawRectangle(float x, float y, float width, float height)
-{
-    glBegin(GL_QUADS);
-        glVertex2i(x, y);
-        glVertex2i(x, y + height);
-        glVertex2i(x + width, y + height);
-        glVertex2i(x + width, y);
-    glEnd();
-}
+void DrawRectangle(float x, float y, float width, float height, Color c);
 
 //============================================================================/
+
+#endif
