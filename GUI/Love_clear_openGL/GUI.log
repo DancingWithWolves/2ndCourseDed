@@ -16,14 +16,14 @@ Created button with id '2'!
 
 =================================================================\
 
-Meow there! I am GraphManager [0x55572e6ebd20].
+Meow there! I am GraphManager [0x558a2365ad20].
 	this->x = 5;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
-	this->label[0x55572e6ebe00] = arf;
-	this->x_axis_text[0x55572e6ebe20] = arfff;
-	this->y_axis_text[0x55572e6ebe40] = arffff;
+	this->label[0x558a2365ae00] = Compares;
+	this->x_axis_text[0x558a2365ae20] = Elems qty;
+	this->y_axis_text[0x558a2365ae40] = Compares qty;
 	this->range_x_low = 0.000000;
 	this->range_x_up = 0.000000;
 	this->range_y_low = 0.000000;
@@ -36,14 +36,14 @@ Meow there! I am GraphManager [0x55572e6ebd20].
 
 =================================================================\
 
-Meow there! I am GraphManager [0x55572e6ebd88].
+Meow there! I am GraphManager [0x558a2365ad88].
 	this->x = 325;
 	this->y = 75;
 	this->width = 310;
 	this->height = 250;
-	this->label[0x55572e6ebe60] = 123;
-	this->x_axis_text[0x55572e6ebe80] = 12345;
-	this->y_axis_text[0x55572e6ebea0] = 123456;
+	this->label[0x558a2365ae60] = Swaps;
+	this->x_axis_text[0x558a2365ae80] = Elems qty;
+	this->y_axis_text[0x558a2365aea0] = Compares qty;
 	this->range_x_low = 0.000000;
 	this->range_x_up = 0.000000;
 	this->range_y_low = 0.000000;
@@ -55,45 +55,64 @@ Meow there! I am GraphManager [0x55572e6ebd88].
 
 
 =================================================================\
-Hello there! I am Graph[0x7ffe82ef34a0] being constructed
+button[2]->active = 1
 =================================================================/
 
 
 =================================================================\
-GraphManager [0x55572e6ebd20]'s new range is:
-	x_low -5
-	x_up 5
-	y_low -5
-	y_up 15
+Meow there! I'm '2' Button pressed!
 =================================================================/
 
 
 =================================================================\
-Meow there! I am Graph[0x7ffe82ef34a0] constructed
+Hello there! I am Graph[0x7ffdcee68bf0] being constructed
 =================================================================/
 
 
 =================================================================\
-Hello there! I am Graph[0x7ffe82ef34a0] being constructed
+GraphManager [0x558a2365ad20]'s new range is:
+	x_low 0
+	x_up 5000
+	y_low 0
+	y_up 67798
 =================================================================/
 
 
 =================================================================\
-Meow there! I am Graph[0x7ffe82ef34a0] constructed
+Meow there! I am Graph[0x7ffdcee68bf0] constructed
 =================================================================/
 
 
 =================================================================\
-Deleted button [0x55572e6eb9d0] with id '0' and label 'Bubble sort'!
+Hello there! I am Graph[0x7ffdcee68bf0] being constructed
 =================================================================/
 
 
 =================================================================\
-Deleted button [0x55572e6eba08] with id '1' and label 'Insertion sort'!
+GraphManager [0x558a2365ad88]'s new range is:
+	x_low 0
+	x_up 5000
+	y_low 0
+	y_up 42104
 =================================================================/
 
 
 =================================================================\
-Deleted button [0x55572e6eba40] with id '2' and label 'Quick sort'!
+Meow there! I am Graph[0x7ffdcee68bf0] constructed
+=================================================================/
+
+
+=================================================================\
+Deleted button [0x558a2365a9d0] with id '0' and label 'Bubble sort'!
+=================================================================/
+
+
+=================================================================\
+Deleted button [0x558a2365aa08] with id '1' and label 'Insertion sort'!
+=================================================================/
+
+
+=================================================================\
+Deleted button [0x558a2365aa40] with id '2' and label 'Quick sort'!
 =================================================================/
 

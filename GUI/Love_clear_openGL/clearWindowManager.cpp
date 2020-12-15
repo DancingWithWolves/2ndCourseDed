@@ -14,16 +14,15 @@
 
 #include <GL/glut.h>
 
-
 const char divider_str_in[] = "\n=================================================================\\\n";
 const char divider_str_out[] = "=================================================================/\n\n";
 FILE* LOG = nullptr;
 
-#define MSG_TO_LOG(format, args...) \
-    LOG = fopen(log_name, "at");    \
-    fprintf(LOG, "%s", divider_str_in);   \
-    fprintf(LOG, format, ##args);   \
-    fprintf(LOG, "%s", divider_str_out);   \
+#define MSG_TO_LOG(format, args...)      \
+    LOG = fopen(log_name, "at");         \
+    fprintf(LOG, "%s", divider_str_in);  \
+    fprintf(LOG, format, ##args);        \
+    fprintf(LOG, "%s", divider_str_out); \
     fclose(LOG);
 
 #ifdef DEBUG
@@ -123,8 +122,8 @@ std::forward_list<Drawable*> drawable_list;
 // Вспомогательная структура для графика
 
 struct Point {
-    float x;
-    float y;
+    int x;
+    int y;
 
     const bool operator>(const Point& point)
     {
@@ -157,7 +156,7 @@ struct Point {
     {
     }
 
-    Point(const float& x, const float& y)
+    Point(const int& x, const int& y)
         : x(x)
         , y(y)
     {
@@ -179,9 +178,9 @@ struct GraphManager : public Drawable {
         GraphManager* daddy;
         const size_t points_qty;
         Point* points;
-        float y_max, y_min, x_max, x_min;
+        int y_max, y_min, x_max, x_min;
 
-        Graph(GraphManager* daddy, const size_t points_qty, const float* x_values, const float* y_values, bool sorted = false)
+        Graph(GraphManager* daddy, const size_t points_qty, const int* x_values, const int* y_values, bool sorted = false)
             : points_qty(points_qty)
             , daddy(daddy)
         {
@@ -235,17 +234,12 @@ struct GraphManager : public Drawable {
                 x_max = 1;
             }
 
-
             if (x_min < daddy->range_x_low
-                || x_max < daddy->range_x_up
+                || x_max > daddy->range_x_up
                 || y_min < daddy->range_y_low
                 || y_max > daddy->range_y_up) {
                 daddy->ChangeRange(
-                    std::min(x_min
-                    , static_cast<float>(daddy->range_x_low))
-                    , std::max(x_max, static_cast<float>(daddy->range_x_up))
-                    , std::min(y_min, static_cast<float>(daddy->range_y_low))
-                    , std::max(y_max, static_cast<float>(daddy->range_y_up)));
+                    std::min(x_min, static_cast<int>(daddy->range_x_low)), std::max(x_max, static_cast<int>(daddy->range_x_up)), std::min(y_min, static_cast<int>(daddy->range_y_low)), std::max(y_max, static_cast<int>(daddy->range_y_up)));
             }
 
             ON_DEBUG(MSG_TO_LOG("Meow there! I am Graph[%p] constructed\n", this))
@@ -253,7 +247,6 @@ struct GraphManager : public Drawable {
 
         ~Graph()
         {
-            // ::operator delete (points);
         }
 
         void Draw()
@@ -265,39 +258,31 @@ struct GraphManager : public Drawable {
             int range_y = daddy->range_y_up - daddy->range_y_low;
             assert(range_y > 0);
 
-            const float dx = daddy->graph_width / range_x;
-            const float dy = daddy->graph_height / range_y;
-
+            const double dx = static_cast<double>(daddy->graph_width) / static_cast<double>(range_x);
+            const double dy = static_cast<double>(daddy->graph_height) / static_cast<double>(range_y);
+            // printf("graph_height = %d, range_y = %d, dy = %lf\n", daddy->graph_height, range_y, dy);
 
             glBegin(GL_LINE_STRIP);
 
             for (size_t i = 0; i < points_qty; ++i) {
-                glVertex2i(daddy->graph_x + (points[i].x - daddy->range_x_low) * dx, daddy->graph_y + daddy->graph_height - (points[i].y - daddy->range_y_low) * dy);
-            }
+                // printf("daddy->graph_x = %d, range_x_low = %d, range_x_up = %d, range_y_low = %d, range_y_up = %d\n", daddy->graph_x, daddy->range_x_low, daddy->range_x_up, daddy->range_y_low, daddy->range_y_up);
+                // printf("points[i].x = %d, points[i].y = %d\n", points[i].x, points[i].y);
 
+                // printf("want to print %f, %f\n", daddy->graph_x + (points[i].x - daddy->range_x_low) * dx, daddy->graph_y + daddy->graph_height - (points[i].y - daddy->range_y_low) * dy);
+                glVertex2i(daddy->graph_x + (points[i].x - daddy->range_x_low) * dx,
+                    daddy->graph_y + daddy->graph_height - (points[i].y - daddy->range_y_low) * dy);
+            }
 
             glEnd();
         }
     };
 
-    GraphManager( int x = 0
-                , int y = 0
-                , int width = 0
-                , int height = 0
-                , int margin_to_graph_x = 0
-                , int margin_to_graph_y = 0
-                , const char* label = default_label
-                , const char* x_axis_text = default_x_text
-                , const char* y_axis_text = default_y_text
-                , int range_x_low = 0
-                , int range_x_up = 0
-                , int range_y_low = 0
-                , int range_y_up = 0)
+    GraphManager(int x = 0, int y = 0, int width = 0, int height = 0, int margin_to_graph_x = 0, int margin_to_graph_y = 0, const char* label = default_label, const char* x_axis_text = default_x_text, const char* y_axis_text = default_y_text, int range_x_low = 0, int range_x_up = 0, int range_y_low = 0, int range_y_up = 0)
         : Drawable(x, y, width, height)
-        , margin_to_graph_x (margin_to_graph_x)
-        , margin_to_graph_y (margin_to_graph_y)
-        , graph_x (x + margin_to_graph_x)
-        , graph_y (y + margin_to_graph_y)
+        , margin_to_graph_x(margin_to_graph_x)
+        , margin_to_graph_y(margin_to_graph_y)
+        , graph_x(x + margin_to_graph_x)
+        , graph_y(y + margin_to_graph_y)
         , graphs_qty(0)
         , range_x_low(range_x_low)
         , range_x_up(range_x_up)
@@ -336,7 +321,15 @@ struct GraphManager : public Drawable {
         free(x_axis_text);
         free(y_axis_text);
     }
-
+    void RenderVerticalBitmapString(float x, float y, int bitmapHeight, void* font, char* string)
+    {
+        char* c;
+        int i;
+        for (c = string, i = 0; *c != '\0'; i++, c++) {
+            glRasterPos2f(x, y + bitmapHeight * i);
+            glutBitmapCharacter(font, *c);
+        }
+    }
     void Draw()
     {
         glColor3f(BUTTON_COLOR);
@@ -357,6 +350,16 @@ struct GraphManager : public Drawable {
         glEnd();
 
         glColor3f(1, 1, 1);
+        
+        float x_axis_fontx = this->x + (this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, reinterpret_cast<unsigned char*>(this->x_axis_text))) / 2;
+        float x_axis_fonty = this->y + this->height - 4 * default_margin;
+        
+        float y_axis_fonty = this->y + (this->height - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, reinterpret_cast<unsigned char*>(this->y_axis_text))) / 2;
+        float y_axis_fontx = this->x + 4 * default_margin;
+
+        Font(GLUT_BITMAP_HELVETICA_12, this->x_axis_text, x_axis_fontx, x_axis_fonty);
+        RenderVerticalBitmapString(y_axis_fontx, y_axis_fonty, 12, GLUT_BITMAP_HELVETICA_12, this->y_axis_text);
+
         for (auto& graph : graphs) {
             graph.Draw();
         }
@@ -364,7 +367,6 @@ struct GraphManager : public Drawable {
 
     void Resize(int new_width, int new_height)
     {
-
     }
 
     void ChangeRange(int new_x_low, int new_x_up, int new_y_low, int new_y_up)
@@ -392,7 +394,7 @@ struct GraphManager : public Drawable {
         graphs.push_front(graph);
     }
 
-    void AddGraph(size_t points_qty, const float* x_values, const float* y_values, bool sorted = true)
+    void AddGraph(size_t points_qty, const int* x_values, const int* y_values, bool sorted = true)
     {
         Graph graph(this, points_qty, x_values, y_values, sorted);
         graphs.push_front(graph);
@@ -609,8 +611,8 @@ struct Button : public Clickable {
 
     void Resize(int new_width, int new_height)
     {
-
     }
+
 private:
     static size_t qty;
     size_t id;
@@ -685,8 +687,6 @@ void Resize(int widht, int height)
         graph_managers[i].graph_width = new_graph_managers_width - 2 * graph_managers[i].margin_to_graph_x;
         graph_managers[i].graph_height = new_graph_managers_width - 2 * graph_managers[i].margin_to_graph_y;
     }
-    
-    
 
     glViewport(0, 0, widht, height);
 }
