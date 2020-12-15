@@ -20,6 +20,7 @@ Engine/GraphSystem.o : Engine/GraphSystem.cpp
 WindowManager.o : WindowManager.cpp
 	$(COMPILE) WindowManager.cpp -c -o WindowManager.o -Werror
 
-clean: 
+clean:
+	rm -f Engine/*.o
 	rm -f *.o 
 	rm -f *.log

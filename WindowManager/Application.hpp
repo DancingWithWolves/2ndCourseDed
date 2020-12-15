@@ -35,7 +35,6 @@ void StartApp()
 
     DrawableWindow* root_drawable_ptr = dynamic_cast<DrawableWindow*>(&Application::AppWindow());
     AddDrawable(root_drawable_ptr);
-
 }
 
 void Run(const int argc, const char* argv[])

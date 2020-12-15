@@ -63,12 +63,11 @@ RectangleWindow::RectangleWindow(Window* parent, Color color, float x, float y, 
 
 RectangleWindow::~RectangleWindow()
 {
-    printf("Suddenly I'm dead x(. My width was %f\n", width);
+    ON_DEBUG(printf("Suddenly I'm dead x(. My width was %.3f\n", width));
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 void RectangleWindow::Draw()
 {
-    printf("draw with width %f and color %f %f %f\n", width, color.r, color.g, color.b);
     DrawRectangle(x, y, width, height, color);
 }
 
