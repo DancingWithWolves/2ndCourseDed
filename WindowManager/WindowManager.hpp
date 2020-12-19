@@ -72,6 +72,7 @@ public:
     void virtual Passive(int mouse_x, int mouse_y) = 0;
     void virtual OnPress(int mouse_x, int mouse_y) = 0;
     void virtual OnRelease(int mouse_x, int mouse_y) = 0;
+    void virtual Callback() = 0;
     bool pressed, highlighted, active;
 };
 
@@ -79,19 +80,20 @@ public:
 
 //============================================================================\
 
-class Button : public ClickableWindow, public RectangleWindow {
+class RectangleButton : public ClickableWindow, public RectangleWindow {
     char* label;
 
 public:
-    Button(Window* parent, Color color, float x, float y, float width, float height, const char label[]);
-    Button(const Button &from) = delete;
-    Button& operator=(const Button& from) = delete;
+    RectangleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[]);
+    RectangleButton(const RectangleButton &from) = delete;
+    RectangleButton& operator=(const RectangleButton& from) = delete;
     bool CheckMouseOver(int mouse_x, int mouse_y);
     virtual void Passive(int mouse_x, int mouse_y) = 0;
     virtual void OnPress(int mouse_x, int mouse_y) = 0;
-    virtual void OnRelease(int mouse_x, int mouse_y) = 0;
+    virtual void OnRelease(int mouse_x, int mouse_y);
+    virtual void Callback() = 0;
 
-    virtual ~Button();
+    virtual ~RectangleButton();
 };
 //============================================================================/
 

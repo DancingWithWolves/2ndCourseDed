@@ -75,24 +75,31 @@ ClickableWindow::ClickableWindow() {
 
 //============================================================================\
 
-Button::Button(Window* parent, Color color, float x, float y, float width, float height, const char label[])
+RectangleButton::RectangleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[])
     : RectangleWindow(parent, color, x, y, width, height)
 {
     this->label = strdup(label);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 
-Button::~Button()
+RectangleButton::~RectangleButton()
 {
     free(label);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
-bool Button::CheckMouseOver(int mouse_x, int mouse_y)
+bool RectangleButton::CheckMouseOver(int mouse_x, int mouse_y)
 {
     return (mouse_x < this->x + this->width
         && mouse_x > this->x
         && mouse_y < this->y + this->height
         && mouse_y > this->y);
+}
+
+void RectangleButton::OnRelease(int mouse_x, int mouse_y)
+{
+    if (CheckMouseOver(mouse_x, mouse_y)) {
+        Callback();
+    }
 }
 
 //============================================================================/

@@ -68,10 +68,6 @@ void EventManager::HandleEvent()
     } break;
     case mouse_press:
         ON_DEBUG(if (the_mouse.button_pressed) printf("The mouse is pressed at %f, %f\n", the_mouse.xpress, the_mouse.ypress););
-
-        {
-            PointEvent* pe1 = static_cast<PointEvent*>(cur_event);
-        }
         for (auto& i : clickable_windows) {
             PointEvent* pe = static_cast<PointEvent*>(cur_event);
             i->OnPress(pe->GetX(), pe->GetY());
@@ -80,6 +76,11 @@ void EventManager::HandleEvent()
 
     case mouse_release:
         ON_DEBUG(if (!the_mouse.button_pressed) printf("The mouse is released at %f, %f\n", the_mouse.x, the_mouse.y););
+
+        for (auto& i : clickable_windows) {
+            PointEvent* pe = static_cast<PointEvent*>(cur_event);
+            i->OnRelease(pe->GetX(), pe->GetY());
+        }
         break;
 
     case mouse_move:
@@ -102,25 +103,21 @@ void EventManager::HandleEvent()
     EventManager::GetEventsQueue().pop();
 }
 
-class SimpleButton : public Button {
+class SimpleButton : public RectangleButton {
 public:
     SimpleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[])
-        : Button(parent, color, x, y, width, height, label)
+        : RectangleButton(parent, color, x, y, width, height, label)
     {
     }
 
-    virtual void Passive(int mouse_x, int mouse_y)
-    {}
-    
-    virtual void OnPress(int mouse_x, int mouse_y)
+    void Passive(int mouse_x, int mouse_y) {}
+
+    void OnPress(int mouse_x, int mouse_y) {}
+
+    void Callback()
     {
-        if (CheckMouseOver(mouse_x, mouse_y)) {
-            printf("Hello there! I am button [%p] being pressed at %d, %d\n", this, mouse_x, mouse_y);
-        }
-    }
-    virtual void OnRelease(int mouse_x, int mouse_y)
-    {
-        printf("Hello there! I am button [%p] being released at %d, %d\n", this, mouse_x, mouse_y);
+        printf("Hello there! I am button [%p] being pressed\n", this);
     }
 };
+
 #endif
