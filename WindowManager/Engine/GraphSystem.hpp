@@ -2,8 +2,8 @@
 #define GRAPHSYSTEM
 
 struct Color {
-    float r, g, b;
-    Color(float r, float g, float b) : r(r), g(g), b(b) {}
+    int r, g, b;
+    Color(int r, int g, int b) : r(r), g(g), b(b) {}
 };
 
 #include "EventSystem.hpp"
@@ -13,7 +13,7 @@ struct Color {
 
 //============================================================================\
 
-void DrawRectangle(float x, float y, float width, float height, Color c);
+void DrawRectangle(int x, int y, int width, int height, Color c);
 
 //============================================================================/
 

@@ -19,13 +19,13 @@ struct Engine {
 
 
 struct Mouse {
-    float x;
-    float y;
+    int x;
+    int y;
     bool button_pressed;
 
     //	хранит координаты в момент первого нажатия кнопки
-    float xpress;
-    float ypress;
+    int xpress;
+    int ypress;
 };
 
 extern Mouse the_mouse; //дефолтный конструктор всё занулит, благо, типы примитивные
@@ -59,7 +59,7 @@ private:
 };
 
 struct PointEvent : public Event {
-    PointEvent(EventType type, float x, float y)
+    PointEvent(EventType type, int x, int y)
         : Event(type)
         , x(x)
         , y(y)
@@ -70,7 +70,7 @@ struct PointEvent : public Event {
     virtual ~PointEvent() {};
 
 private:
-    float x = 0, y = 0;
+    int x = 0, y = 0;
 };
 
 

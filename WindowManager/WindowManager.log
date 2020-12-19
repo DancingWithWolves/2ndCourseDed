@@ -8,7 +8,7 @@ Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWind
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, float, float, float, float)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
 ==========================================================================================/
 
 ==========================================================================================\
@@ -20,7 +20,7 @@ Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWind
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, float, float, float, float)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
 ==========================================================================================/
 
 ==========================================================================================\
@@ -32,7 +32,7 @@ Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWind
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, float, float, float, float)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
 ==========================================================================================/
 
 ==========================================================================================\
@@ -48,11 +48,11 @@ Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWind
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, float, float, float, float)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleButton::RectangleButton(Window*, Color, float, float, float, float, const char*)>, line 82!
+Meow there from file <WindowManager.cpp>, function <RectangleButton::RectangleButton(Window*, Color, int, int, int, int, const char*)>, line 82!
 ==========================================================================================/
 
 ==========================================================================================\
@@ -64,7 +64,7 @@ Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWind
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, float, float, float, float)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
 ==========================================================================================/
 
 ==========================================================================================\

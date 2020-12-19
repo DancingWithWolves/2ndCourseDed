@@ -46,16 +46,16 @@ public:
 
 class RectangleWindow : public DrawableWindow {
 protected:
-    float x, y, width, height;
+    int x, y, width, height;
 
 public:
-    RectangleWindow(Window* parent, Color color, float x, float y, float width, float height);
+    RectangleWindow(Window* parent, Color color, int x, int y, int width, int height);
     virtual ~RectangleWindow();
     void Draw();
-    float GetX() { return x; };
-    float GetY() { return y; }
-    void SetX(float x) { this->x = x; };
-    void SetY(float y) { this->y = y; };
+    int GetX() { return x; };
+    int GetY() { return y; }
+    void SetX(int x) { this->x = x; };
+    void SetY(int y) { this->y = y; };
 };
 //============================================================================/
 
@@ -84,7 +84,7 @@ class RectangleButton : public ClickableWindow, public RectangleWindow {
     char* label;
 
 public:
-    RectangleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[]);
+    RectangleButton(Window* parent, Color color, int x, int y, int width, int height, const char label[]);
     RectangleButton(const RectangleButton &from) = delete;
     RectangleButton& operator=(const RectangleButton& from) = delete;
     bool CheckMouseOver(int mouse_x, int mouse_y);

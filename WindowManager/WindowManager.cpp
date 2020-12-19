@@ -47,7 +47,7 @@ DrawableWindow::DrawableWindow(Window* parent, Color color)
 
     DrawableWindow::~DrawableWindow() { FULL_TRACE(MSG_TO_LOG(meow)) } //============================================================================/
 
-    RectangleWindow::RectangleWindow(Window * parent, Color color, float x, float y, float width, float height)
+    RectangleWindow::RectangleWindow(Window * parent, Color color, int x, int y, int width, int height)
     : DrawableWindow(parent, color)
     , x(x)
     , y(y)
@@ -56,7 +56,7 @@ DrawableWindow::DrawableWindow(Window* parent, Color color)
 
     RectangleWindow::~RectangleWindow()
 {
-    ON_DEBUG(printf("Suddenly I'm dead x(. My width was %.3f\n", width));
+    ON_DEBUG(printf("Suddenly I'm dead x(. My width was %d\n", width));
     FULL_TRACE(MSG_TO_LOG(meow))
 }
 void RectangleWindow::Draw()
@@ -75,7 +75,7 @@ ClickableWindow::ClickableWindow() {
 
 //============================================================================\
 
-RectangleButton::RectangleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[])
+RectangleButton::RectangleButton(Window* parent, Color color, int x, int y, int width, int height, const char label[])
     : RectangleWindow(parent, color, x, y, width, height)
 {
     this->label = strdup(label);

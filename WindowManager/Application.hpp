@@ -67,7 +67,7 @@ void EventManager::HandleEvent()
         Draw(cur_window);
     } break;
     case mouse_press:
-        ON_DEBUG(if (the_mouse.button_pressed) printf("The mouse is pressed at %f, %f\n", the_mouse.xpress, the_mouse.ypress););
+        ON_DEBUG(if (the_mouse.button_pressed) printf("The mouse is pressed at %d, %d\n", the_mouse.xpress, the_mouse.ypress););
         for (auto& i : clickable_windows) {
             PointEvent* pe = static_cast<PointEvent*>(cur_event);
             i->OnPress(pe->GetX(), pe->GetY());
@@ -75,7 +75,7 @@ void EventManager::HandleEvent()
         break;
 
     case mouse_release:
-        ON_DEBUG(if (!the_mouse.button_pressed) printf("The mouse is released at %f, %f\n", the_mouse.x, the_mouse.y););
+        ON_DEBUG(if (!the_mouse.button_pressed) printf("The mouse is released at %d, %d\n", the_mouse.x, the_mouse.y););
 
         for (auto& i : clickable_windows) {
             PointEvent* pe = static_cast<PointEvent*>(cur_event);
@@ -105,7 +105,7 @@ void EventManager::HandleEvent()
 
 class SimpleButton : public RectangleButton {
 public:
-    SimpleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[])
+    SimpleButton(Window* parent, Color color, int x, int y, int width, int height, const char label[])
         : RectangleButton(parent, color, x, y, width, height, label)
     {
     }

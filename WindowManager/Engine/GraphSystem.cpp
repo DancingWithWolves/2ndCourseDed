@@ -1,6 +1,6 @@
 #include "GraphSystem.hpp"
 
-void DrawRectangle(float x, float y, float width, float height, Color color = Color(DEFAULT_COLOR))
+void DrawRectangle(int x, int y, int width, int height, Color color = Color(DEFAULT_COLOR))
 {
     sf::RectangleShape rs;
     rs.setSize(sf::Vector2f(width, height));
