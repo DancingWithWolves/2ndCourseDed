@@ -22,7 +22,6 @@ unordered_set<Window*> windows;
 unordered_set<DrawableWindow*> drawable_windows;
 unordered_set<ClickableWindow*> clickable_windows;
 
-
 static void AddDrawable(DrawableWindow* dwptr)
 {
     windows.insert(dwptr);
@@ -45,39 +44,42 @@ void Run(const int argc, const char* argv[])
 void Engine::MainLoop() { }
 
 void Draw(DrawableWindow* cur)
-{  
-    if (!cur) 
+{
+    if (!cur)
         return;
 
     cur->Draw();
 
     if (!cur->children.empty()) {
-        for (auto &i : cur->children) {
-            DrawableWindow *new_dw = dynamic_cast<DrawableWindow*>(i);
+        for (auto& i : cur->children) {
+            DrawableWindow* new_dw = dynamic_cast<DrawableWindow*>(i);
             Draw(new_dw);
         }
     }
 }
 
-
 void EventManager::HandleEvent()
 {
-    Event& cur_event = EventManager::GetEventsQueue().front();
-    switch (cur_event.GetType()) {
+    Event* cur_event = EventManager::GetEventsQueue().front();
+    switch (cur_event->GetType()) {
     case redraw: {
-            DrawableWindow* cur_window = dynamic_cast<DrawableWindow*>(root_ptr);
-            Draw(cur_window);
-        }        
-        break;
+        DrawableWindow* cur_window = static_cast<DrawableWindow*>(root_ptr);
+        Draw(cur_window);
+    } break;
     case mouse_press:
+        ON_DEBUG(if (the_mouse.button_pressed) printf("The mouse is pressed at %f, %f\n", the_mouse.xpress, the_mouse.ypress););
 
+        {
+            PointEvent* pe1 = static_cast<PointEvent*>(cur_event);
+        }
         for (auto& i : clickable_windows) {
-            PointEvent& pe = dynamic_cast<PointEvent&>(cur_event);
-            i->OnPress(pe.GetX(), pe.GetY());
+            PointEvent* pe = static_cast<PointEvent*>(cur_event);
+            i->OnPress(pe->GetX(), pe->GetY());
         }
         break;
 
     case mouse_release:
+        ON_DEBUG(if (!the_mouse.button_pressed) printf("The mouse is released at %f, %f\n", the_mouse.x, the_mouse.y););
         break;
 
     case mouse_move:
@@ -95,7 +97,30 @@ void EventManager::HandleEvent()
     default:
         break;
     }
+    // TODO:
+    delete EventManager::GetEventsQueue().front();
     EventManager::GetEventsQueue().pop();
 }
 
+class SimpleButton : public Button {
+public:
+    SimpleButton(Window* parent, Color color, float x, float y, float width, float height, const char label[])
+        : Button(parent, color, x, y, width, height, label)
+    {
+    }
+
+    virtual void Passive(int mouse_x, int mouse_y)
+    {}
+    
+    virtual void OnPress(int mouse_x, int mouse_y)
+    {
+        if (CheckMouseOver(mouse_x, mouse_y)) {
+            printf("Hello there! I am button [%p] being pressed at %d, %d\n", this, mouse_x, mouse_y);
+        }
+    }
+    virtual void OnRelease(int mouse_x, int mouse_y)
+    {
+        printf("Hello there! I am button [%p] being released at %d, %d\n", this, mouse_x, mouse_y);
+    }
+};
 #endif

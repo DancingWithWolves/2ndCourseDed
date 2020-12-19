@@ -45,6 +45,7 @@ public:
 //============================================================================\
 
 class RectangleWindow : public DrawableWindow {
+protected:
     float x, y, width, height;
 
 public:
@@ -60,14 +61,10 @@ public:
 
 //============================================================================\
 
-class ClickableWindow : public Window {
-
-protected:
-    typedef void (*Callback)();
-    Callback callback;
+class ClickableWindow {
 
 public:
-    ClickableWindow(Window* parent, Callback callback);
+    ClickableWindow();
 
     virtual ~ClickableWindow();
 
@@ -78,6 +75,24 @@ public:
     bool pressed, highlighted, active;
 };
 
+//============================================================================/
+
+//============================================================================\
+
+class Button : public ClickableWindow, public RectangleWindow {
+    char* label;
+
+public:
+    Button(Window* parent, Color color, float x, float y, float width, float height, const char label[]);
+    Button(const Button &from) = delete;
+    Button& operator=(const Button& from) = delete;
+    bool CheckMouseOver(int mouse_x, int mouse_y);
+    virtual void Passive(int mouse_x, int mouse_y) = 0;
+    virtual void OnPress(int mouse_x, int mouse_y) = 0;
+    virtual void OnRelease(int mouse_x, int mouse_y) = 0;
+
+    virtual ~Button();
+};
 //============================================================================/
 
 #endif

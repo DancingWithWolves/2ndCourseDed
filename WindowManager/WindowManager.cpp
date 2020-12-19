@@ -1,4 +1,5 @@
 #include "WindowManager.hpp"
+#include <string.h>
 
 //============================================================================\
 
@@ -40,28 +41,20 @@ void Window::EraseChild(Window* child)
 
 DrawableWindow::DrawableWindow(Window* parent, Color color)
     : Window(parent)
-    , color(color)
-{
-    FULL_TRACE(MSG_TO_LOG(meow))
-}
+    , color(color) {
+        FULL_TRACE(MSG_TO_LOG(meow))
+    }
 
-DrawableWindow::~DrawableWindow() 
-{
-    FULL_TRACE(MSG_TO_LOG(meow))
-}
-//============================================================================/
+    DrawableWindow::~DrawableWindow() { FULL_TRACE(MSG_TO_LOG(meow)) } //============================================================================/
 
-RectangleWindow::RectangleWindow(Window* parent, Color color, float x, float y, float width, float height)
+    RectangleWindow::RectangleWindow(Window * parent, Color color, float x, float y, float width, float height)
     : DrawableWindow(parent, color)
     , x(x)
     , y(y)
     , width(width)
-    , height(height)
-{
-    FULL_TRACE(MSG_TO_LOG(meow))
-}
+    , height(height) { FULL_TRACE(MSG_TO_LOG(meow)) }
 
-RectangleWindow::~RectangleWindow()
+    RectangleWindow::~RectangleWindow()
 {
     ON_DEBUG(printf("Suddenly I'm dead x(. My width was %.3f\n", width));
     FULL_TRACE(MSG_TO_LOG(meow))
@@ -73,14 +66,33 @@ void RectangleWindow::Draw()
 
 //============================================================================\
 
-ClickableWindow::ClickableWindow(Window* parent, Callback callback)
-    : Window(parent)
-    , callback(callback)
-{
+ClickableWindow::ClickableWindow() {
+    FULL_TRACE(MSG_TO_LOG(meow))
+} ClickableWindow::~ClickableWindow() {
     FULL_TRACE(MSG_TO_LOG(meow))
 }
-ClickableWindow::~ClickableWindow()
+//============================================================================/
+
+//============================================================================\
+
+Button::Button(Window* parent, Color color, float x, float y, float width, float height, const char label[])
+    : RectangleWindow(parent, color, x, y, width, height)
 {
+    this->label = strdup(label);
     FULL_TRACE(MSG_TO_LOG(meow))
 }
+
+Button::~Button()
+{
+    free(label);
+    FULL_TRACE(MSG_TO_LOG(meow))
+}
+bool Button::CheckMouseOver(int mouse_x, int mouse_y)
+{
+    return (mouse_x < this->x + this->width
+        && mouse_x > this->x
+        && mouse_y < this->y + this->height
+        && mouse_y > this->y);
+}
+
 //============================================================================/

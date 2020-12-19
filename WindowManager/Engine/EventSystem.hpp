@@ -17,6 +17,19 @@ struct Engine {
 #include <unordered_set>
 #include <vector>
 
+
+struct Mouse {
+    float x;
+    float y;
+    bool button_pressed;
+
+    //	хранит координаты в момент первого нажатия кнопки
+    float xpress;
+    float ypress;
+};
+
+extern Mouse the_mouse; //дефолтный конструктор всё занулит, благо, типы примитивные
+
 //============================================================================\
 //                                  Ивенты
 //============================================================================/
@@ -46,7 +59,7 @@ private:
 };
 
 struct PointEvent : public Event {
-    PointEvent(EventType type, int x, int y)
+    PointEvent(EventType type, float x, float y)
         : Event(type)
         , x(x)
         , y(y)
@@ -57,7 +70,7 @@ struct PointEvent : public Event {
     virtual ~PointEvent() {};
 
 private:
-    int x = 0, y = 0;
+    float x = 0, y = 0;
 };
 
 
@@ -68,7 +81,7 @@ private:
 class EventManager {
 
 public:
-    static std::queue<Event>& GetEventsQueue();
+    static std::queue<Event*>& GetEventsQueue();
     static void HandleEvent();
 };
 

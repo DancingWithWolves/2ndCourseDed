@@ -2,6 +2,7 @@
 
 sf::RenderWindow* Engine::system_window_ptr = nullptr;
 
+Mouse the_mouse = Mouse();
 //============================================================================\
 
 void MainLoop();
@@ -29,22 +30,35 @@ void Engine::StartEngine(const int argc, const char* argv[])
                 break;
 
             case sf::Event::MouseButtonPressed:
-                EventManager::GetEventsQueue().emplace(PointEvent(mouse_press, event.size.width, event.size.height));
+
+                the_mouse.button_pressed = true;
+                the_mouse.xpress = event.mouseButton.x;
+                the_mouse.ypress = event.mouseButton.y;
+
+                EventManager::GetEventsQueue().push(new PointEvent(mouse_press, event.mouseButton.x, event.mouseButton.y));
                 break;
 
             case sf::Event::MouseButtonReleased:
-                EventManager::GetEventsQueue().emplace(PointEvent(mouse_release, event.size.width, event.size.height));
+
+                the_mouse.button_pressed = false;
+                the_mouse.xpress = -1;
+                the_mouse.ypress = -1;
+
+                EventManager::GetEventsQueue().push(new PointEvent(mouse_release, event.mouseButton.x, event.mouseButton.y));
                 break;
 
             case sf::Event::MouseMoved:
-                EventManager::GetEventsQueue().emplace(PointEvent(mouse_move, event.size.width, event.size.height));
+                the_mouse.x = event.mouseMove.x;
+                the_mouse.y = event.mouseMove.y;
+
+                EventManager::GetEventsQueue().push(new PointEvent(mouse_move, event.mouseMove.x, event.mouseMove.y));
                 break;
 
             default:
                 break;
             }
         }
-        EventManager::GetEventsQueue().emplace(Event(redraw));
+        EventManager::GetEventsQueue().emplace(new Event(redraw));
         while (!EventManager::GetEventsQueue().empty()) {
             EventManager::HandleEvent();
         }
@@ -57,9 +71,9 @@ void Engine::StartEngine(const int argc, const char* argv[])
 
 //============================================================================\
 
-std::queue<Event>& EventManager::EventManager::GetEventsQueue()
+std::queue<Event*>& EventManager::EventManager::GetEventsQueue()
 {
-    static std::queue<Event> event_queue;
+    static std::queue<Event*> event_queue;
     return event_queue;
 }
 
