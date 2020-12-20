@@ -39,11 +39,28 @@ void TestTextureWindows(const int argc, const char*argv[])
     delete road;
     // delete button; -- не нужно, т.к. button -- дочернее окно.
 }
+
+void TestSlider(const int argc, const char* argv[])
+{  
+    auto contain = new TextureWindow(root_ptr, "./Images/contain.png", 0, 0, 658, 324);
+    auto slider = new VerticalScrollWindow(root_ptr, "./Images/scrollRoad.png", 658, 0, 28, 324, "./Images/scrollButton.png", 660, 0, 24, 30);
+
+    AddDrawable(contain);
+    AddDrawable(slider);
+    clickable_windows.insert(slider);
+
+    Run(argc, argv);
+
+    delete contain;
+    delete slider;
+}
 int main(const int argc, const char* argv[])
 {
     StartApp();
     
-    TestTextureWindows(argc, argv);
+    TestSlider(argc, argv);
+
+    // auto vsw = new VerticalScrollWindow ();
     
     return 0;
 }

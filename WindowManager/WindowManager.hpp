@@ -47,9 +47,9 @@ public:
 //============================================================================/
 
 class TextureWindow : public DrawableWindow {
-protected:
-    Sprite sprite;
 public:
+    Sprite sprite;
+
     TextureWindow(Window *parent, const char* texture_fname, int x, int y, int width, int height);
     virtual ~TextureWindow();
     virtual void Draw();
@@ -113,8 +113,6 @@ public:
     virtual ~RectangleButton();
 };
 
-//============================================================================\
-//                        Интерфейс перетаскиваемого окна
-//============================================================================
+
 
 #endif

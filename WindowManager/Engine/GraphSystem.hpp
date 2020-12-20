@@ -64,8 +64,16 @@ public:
 
     int GetX() { return x; };
     int GetY() { return y; }
-    void SetX(int x) { this->x = x; };
-    void SetY(int y) { this->y = y; };
+    void SetX(int x) 
+    { 
+        this->x = x;
+        sf_sprite.setPosition(x, y);
+    };
+    void SetY(int y) 
+    { 
+        this->y = y; 
+        sf_sprite.setPosition(x, y);
+    };
 
     int GetWidth() { return width; };
     int GetHeight() { return height; }

@@ -1,4 +1,5 @@
 #include "EventSystem.hpp"
+#include "../WindowManager.hpp"
 
 sf::RenderWindow* Engine::system_window_ptr = nullptr;
 

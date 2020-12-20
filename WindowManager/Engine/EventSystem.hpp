@@ -11,7 +11,6 @@ struct Engine {
     static void MainLoop();
 };
 
-#include "../WindowManager.hpp"
 
 #include <queue>
 #include <unordered_set>
