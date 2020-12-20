@@ -219,6 +219,12 @@ public:
     void MoveView(float prop)
     {
         printf(meow);
+        if (prop < 0) {
+            prop = 0;
+        }
+        if (prop > 1) {
+            prop = 1;
+        }
         if (sprite.GetTextureHeight() > sprite.GetHeight()) {
             int new_y = static_cast<int>(prop * static_cast<float>(sprite.GetTextureHeight() - sprite.GetHeight()));
             sprite.SetShowedTextureY(new_y);

@@ -16,10 +16,10 @@ void TestRectWindows(const int argc, const char*argv[])
 
     Run(argc, argv);
 
-    // delete button;
-    // delete child;
-    // delete rwptr;
-    // delete rwptr_2;
+    delete button;
+    delete child;
+    delete rwptr;
+    delete rwptr_2;
 }
 
 
@@ -42,29 +42,26 @@ void TestTextureWindows(const int argc, const char*argv[])
 
 void TestSlider(const int argc, const char* argv[])
 {  
-    // auto contain = new TextureWindow(root_ptr, "./Images/contain.png", 0, 0, 658, 324);
-    // auto slider = new VerticalScrollWindow(root_ptr, "./Images/scrollRoad.png", 658, 0, 28, 324, "./Images/scrollButton.png", 660, 0, 24, 30);
     auto scrollable = new ScrollableWindow(root_ptr, 
                     "./Images/contain.png", 0, 0, 658, 324, 
                     "./Images/scrollRoad.png", 658, 0, 28, 324, 
                     "./Images/scrollButton.png", 660, 0, 24, 30);
     
     AddDrawable(scrollable);
-    // AddDrawable(slider);
-    // clickable_windows.insert(slider);
-
+    
     Run(argc, argv);
 
     delete scrollable;
-    // delete slider;
 }
+
 int main(const int argc, const char* argv[])
 {
     StartApp();
-    
-    TestSlider(argc, argv);
 
-    // auto vsw = new VerticalScrollWindow ();
+    
+    // TestRectWindows(argc, argv);
+    // TestTextureWindows(argc, argv);
+    TestSlider(argc, argv);
     
     return 0;
 }
