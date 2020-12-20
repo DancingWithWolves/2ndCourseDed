@@ -57,10 +57,27 @@ public:
     int GetShowedTextureWidth() { return showed_texture_width; }
     int GetShowedTextureHeight() { return showed_texture_height; }
 
-    void SetShowedTextureX(int x) { showed_texture_x = x; }
-    void SetShowedTextureY(int y) { showed_texture_y = y; }
-    void SetShowedTextureWidth(int width) { showed_texture_width = width; }
-    void SetShowedTextureHeight(int height) { showed_texture_height = height; }
+    void SetShowedTextureX(int x) 
+    { 
+        showed_texture_x = x;
+        sf_sprite.setTextureRect(sf::IntRect(showed_texture_x, showed_texture_y, showed_texture_width, showed_texture_height));
+    }
+
+    void SetShowedTextureY(int y) 
+    { 
+        showed_texture_y = y;
+        sf_sprite.setTextureRect(sf::IntRect(showed_texture_x, showed_texture_y, showed_texture_width, showed_texture_height)); 
+    }
+
+    void SetShowedTextureWidth(int width) { 
+        showed_texture_width = width; 
+        sf_sprite.setTextureRect(sf::IntRect(showed_texture_x, showed_texture_y, showed_texture_width, showed_texture_height));
+    }
+
+    void SetShowedTextureHeight(int height) { 
+        showed_texture_height = height;
+        sf_sprite.setTextureRect(sf::IntRect(showed_texture_x, showed_texture_y, showed_texture_width, showed_texture_height));
+    }
 
     int GetX() { return x; };
     int GetY() { return y; }

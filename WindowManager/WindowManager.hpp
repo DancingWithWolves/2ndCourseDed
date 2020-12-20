@@ -13,7 +13,7 @@ using std::unordered_set;
 //                        Абстрактное окно
 //============================================================================/
 class Window {
-private:
+protected:
     Window* sweet_daddy;
 
 public:
@@ -114,28 +114,9 @@ public:
 };
 
 
-//============================================================================\
-//                        Имплементация перетаскиваемого окна
-//============================================================================/
 
-class VerticalScrollWindow : public ClickableWindow, public TextureWindow {
-protected:
-    TextureWindow slider;
-public:
-    VerticalScrollWindow(Window *parent, const char* texture_container_fname, int x, int y, int width, int height,
-                         const char* texture_slider_fname, int slider_x, int slider_y, int slider_width, int slider_height);
-    void MoveSlider(float prop_y);
 
-    void Passive(int mouse_x, int mouse_y);
-    void OnPress(int mouse_x, int mouse_y);
-    void OnRelease(int mouse_x, int mouse_y);
-    void Callback();
 
-    bool CheckMouseOver(int mouse_x, int mouse_y);
-
-    float prop_y;
-    bool is_dragged;
-};
 
 
 #endif

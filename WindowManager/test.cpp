@@ -42,17 +42,21 @@ void TestTextureWindows(const int argc, const char*argv[])
 
 void TestSlider(const int argc, const char* argv[])
 {  
-    auto contain = new TextureWindow(root_ptr, "./Images/contain.png", 0, 0, 658, 324);
-    auto slider = new VerticalScrollWindow(root_ptr, "./Images/scrollRoad.png", 658, 0, 28, 324, "./Images/scrollButton.png", 660, 0, 24, 30);
-
-    AddDrawable(contain);
-    AddDrawable(slider);
-    clickable_windows.insert(slider);
+    // auto contain = new TextureWindow(root_ptr, "./Images/contain.png", 0, 0, 658, 324);
+    // auto slider = new VerticalScrollWindow(root_ptr, "./Images/scrollRoad.png", 658, 0, 28, 324, "./Images/scrollButton.png", 660, 0, 24, 30);
+    auto scrollable = new ScrollableWindow(root_ptr, 
+                    "./Images/contain.png", 0, 0, 658, 324, 
+                    "./Images/scrollRoad.png", 658, 0, 28, 324, 
+                    "./Images/scrollButton.png", 660, 0, 24, 30);
+    
+    AddDrawable(scrollable);
+    // AddDrawable(slider);
+    // clickable_windows.insert(slider);
 
     Run(argc, argv);
 
-    delete contain;
-    delete slider;
+    delete scrollable;
+    // delete slider;
 }
 int main(const int argc, const char* argv[])
 {
