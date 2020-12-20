@@ -2,7 +2,8 @@
 #include <string.h>
 
 //============================================================================\
-
+//                        Интерфейс абстрактного окна
+//============================================================================/
 
 Window::Window(Window* parent)
     : sweet_daddy(parent)
@@ -35,9 +36,10 @@ void Window::EraseChild(Window* child)
 {
     children.erase(child);
 }
-//============================================================================/
 
 //============================================================================\
+//                        Интерфейс риусемого окна
+//============================================================================/
 
 DrawableWindow::DrawableWindow(Window* parent, Color color)
     : Window(parent)
@@ -45,9 +47,33 @@ DrawableWindow::DrawableWindow(Window* parent, Color color)
         FULL_TRACE(MSG_TO_LOG(meow))
     }
 
-    DrawableWindow::~DrawableWindow() { FULL_TRACE(MSG_TO_LOG(meow)) } //============================================================================/
+DrawableWindow::~DrawableWindow() { FULL_TRACE(MSG_TO_LOG(meow)) }
 
-    RectangleWindow::RectangleWindow(Window * parent, Color color, int x, int y, int width, int height)
+//============================================================================\
+//                 Рисуемое окно с текстурой
+//============================================================================/
+
+TextureWindow::TextureWindow(Window * parent,
+        const char* texture_fname, int x, int y, int width, int height)
+    : DrawableWindow(parent, Color(DEFAULT_COLOR))
+    , sprite(texture_fname, x, y, width, height) {
+        Draw();
+        // printf("sprite.showed_texture_x = %d, showed_texture_y = %d, showed_texture_width = %d, showed_texture_height = %d\n\n\n",
+        // sprite.GetShowedTextureX(), sprite.GetShowedTextureY(), sprite.GetShowedTextureWidth(), sprite.GetShowedTextureHeight());
+    }
+
+TextureWindow::~TextureWindow(){}
+
+void TextureWindow::Draw()
+{
+    DrawSprite(sprite);
+}
+
+//============================================================================\
+//                  Интерфейс прямоугольного рисуемого окна
+//============================================================================/
+
+RectangleWindow::RectangleWindow(Window* parent, Color color, int x, int y, int width, int height)
     : DrawableWindow(parent, color)
     , x(x)
     , y(y)
@@ -63,17 +89,6 @@ void RectangleWindow::Draw()
 {
     DrawRectangle(x, y, width, height, color);
 }
-
-//============================================================================\
-
-ClickableWindow::ClickableWindow() {
-    FULL_TRACE(MSG_TO_LOG(meow))
-} ClickableWindow::~ClickableWindow() {
-    FULL_TRACE(MSG_TO_LOG(meow))
-}
-//============================================================================/
-
-//============================================================================\
 
 RectangleButton::RectangleButton(Window* parent, Color color, int x, int y, int width, int height, const char label[])
     : RectangleWindow(parent, color, x, y, width, height)
@@ -102,4 +117,13 @@ void RectangleButton::OnRelease(int mouse_x, int mouse_y)
     }
 }
 
+//============================================================================\
+//                        Интерфейс кликабельного окна
 //============================================================================/
+
+ClickableWindow::ClickableWindow() {
+    FULL_TRACE(MSG_TO_LOG(meow))
+} ClickableWindow::~ClickableWindow()
+{
+    FULL_TRACE(MSG_TO_LOG(meow))
+}

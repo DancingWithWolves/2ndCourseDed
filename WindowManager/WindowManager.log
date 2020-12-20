@@ -1,136 +1,64 @@
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 13!
+Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 14!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 45!
+Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 47!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
+Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 81!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 13!
+Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 14!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 45!
+Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 47!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
+Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 14!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 13!
+Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 47!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 45!
+Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 14!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
+Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 47!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <ClickableWindow::ClickableWindow()>, line 70!
+Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 50!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 13!
+Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 27!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 45!
+Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 50!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
+Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 27!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleButton::RectangleButton(Window*, Color, int, int, int, int, const char*)>, line 82!
+Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 86!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <Window::Window(Window*)>, line 13!
+Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 50!
 ==========================================================================================/
 
 ==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <DrawableWindow::DrawableWindow(Window*, Color)>, line 45!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <RectangleWindow::RectangleWindow(Window*, Color, int, int, int, int)>, line 55!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleButton::~RectangleButton()>, line 88!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 60!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 48!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 26!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual ClickableWindow::~ClickableWindow()>, line 72!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 60!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 48!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 26!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 60!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 48!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 26!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 60!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 48!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 26!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual RectangleWindow::~RectangleWindow()>, line 60!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual DrawableWindow::~DrawableWindow()>, line 48!
-==========================================================================================/
-
-==========================================================================================\
-Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 26!
+Meow there from file <WindowManager.cpp>, function <virtual Window::~Window()>, line 27!
 ==========================================================================================/

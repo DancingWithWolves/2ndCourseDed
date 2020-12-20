@@ -43,7 +43,21 @@ public:
 };
 
 //============================================================================\
-//                        Интерфейс прямоугольного окна
+//                 Рисуемое окно с текстурой
+//============================================================================/
+
+class TextureWindow : public DrawableWindow {
+protected:
+    Sprite sprite;
+public:
+    TextureWindow(Window *parent, const char* texture_fname, int x, int y, int width, int height);
+    virtual ~TextureWindow();
+    virtual void Draw();
+};
+
+
+//============================================================================\
+//                  Прямоугольное окно с заливкой
 //============================================================================/
 
 class RectangleWindow : public DrawableWindow {
@@ -88,7 +102,7 @@ class RectangleButton : public ClickableWindow, public RectangleWindow {
 
 public:
     RectangleButton(Window* parent, Color color, int x, int y, int width, int height, const char label[]);
-    RectangleButton(const RectangleButton &from) = delete;
+    RectangleButton(const RectangleButton& from) = delete;
     RectangleButton& operator=(const RectangleButton& from) = delete;
     bool CheckMouseOver(int mouse_x, int mouse_y);
     virtual void Passive(int mouse_x, int mouse_y) = 0;
@@ -99,10 +113,8 @@ public:
     virtual ~RectangleButton();
 };
 
-
 //============================================================================\
 //                        Интерфейс перетаскиваемого окна
 //============================================================================
-
 
 #endif

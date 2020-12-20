@@ -2,6 +2,10 @@ COMPILE=g++
 LIBS=-lGL -lsfml-graphics -lsfml-window -lsfml-system
 OBJS=test.o Engine/EventSystem.o Engine/GraphSystem.o WindowManager.o
 
+quiet_run : clean build
+	rm -f output
+	./test.out &>>output.log
+
 clean_run : clean build
 	./test.out
 
