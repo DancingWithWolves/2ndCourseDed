@@ -247,7 +247,7 @@ int main(int argc, char** argv)
         , 8*default_margin
         , "Swaps"
         , "Elems qty"
-        , "Compares qty"
+        , "Swaps qty"
         , 0
         , 0
         , 0
