@@ -54,7 +54,11 @@ void Engine::StartEngine(const int argc, const char* argv[])
 
                 EventManager::GetEventsQueue().push(new PointEvent(mouse_move, event.mouseMove.x, event.mouseMove.y));
                 break;
-
+            case sf::Event::Resized:
+                if (app_window.getSize() != sf::Vector2u(START_SIZE)) {
+                    app_window.setSize(sf::Vector2u(START_SIZE));
+                } 
+                break;
             default:
                 break;
             }
