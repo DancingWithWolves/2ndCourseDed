@@ -1,3 +1,3 @@
 #define DEFAULT_COLOR 0, 128, 0
 #define SECOND_COLOR 0, 0, 128
-#define START_SIZE 1000, 1000
+#define START_SIZE 328, 324
