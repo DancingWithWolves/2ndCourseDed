@@ -7,4 +7,4 @@
 `sudo apt-get install libsfml-dev`
 
 При компиляции приложения не забудьте указать флаги:
-`g++ main.cpp LIBS=-lGL -lsfml-graphics -lsfml-window -lsfml-system`
+`-lGL -lsfml-graphics -lsfml-window -lsfml-system`
