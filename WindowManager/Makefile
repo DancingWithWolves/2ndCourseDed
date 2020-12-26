@@ -4,7 +4,7 @@ OBJS=Builds/test.o Builds/EventSystem.o Builds/GraphSystem.o Builds/WindowManage
 
 quiet_run : clean build
 	rm -f output
-	./test.out &>>output.log
+	./test.out >>output.log
 
 clean_run : clean build
 	./test.out
